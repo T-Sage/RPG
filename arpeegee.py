@@ -1,4 +1,5 @@
 import random
+from collections import Counter
 
 BATTLE_SCREEN_WIDTH = 60
 BATTLE_SCREEN_HEIGHT = 10
@@ -90,7 +91,7 @@ def char_select(encounter):
             
         break
     
-    while True:
+    while True: #todo: implement enemy selection from duplicates
         enemy_selection = input("Select enemy to attack: ").strip().casefold()
         conf_enemy_selection = None
 
@@ -104,10 +105,29 @@ def char_select(encounter):
         if conf_enemy_selection.alive == False:
             print(f"{conf_enemy_selection.name} is dead!")
             continue
-            
+        enemy_enumerator(encounter)    
         break
 
     attack(conf_char_selection, conf_enemy_selection)
+
+def enemy_enumerator(encounter):
+    # current work in progress 
+    counts = Counter(enemy.name.casefold() for enemy in encounter.enemies)
+    enemy_choices = {}
+    name_counts = {}
+
+    for enemy in encounter.enemies:
+        key = enemy.name.casefold()
+
+        if counts[key] > 1:
+            name_counts[key] = name_counts.get(key, 0) + 1
+            label = f"{enemy.name} {name_counts[key]}"
+        else:
+            label = enemy.name
+
+        enemy_choices[label.casefold()] = enemy
+
+    return enemy_choices
 
 def attack(attacker, defender):
     attacker.turn = False
@@ -136,6 +156,9 @@ def attack(attacker, defender):
     else:
         print("Miss!")
 
+#def enemy_round(encounter):
+
+
 
 class Encounter:
     def __init__(self, party, enemies):
@@ -144,8 +167,8 @@ class Encounter:
         
 def test_encounter():
     return Encounter (
-            party = [Fighter()],
-            enemies = [Bandit(), Bandit()]
+            party = [Fighter(), Wizard(), Rogue(), Cleric()],
+            enemies = [Bandit(), Bandit(), Bandit(), Bandit()]
         )
 
 class Bandit:
@@ -171,16 +194,53 @@ class Fighter:
         self.damage_bonus = 5
         self.alive = True
         self.turn = True
+
+class Rogue:
+    def __init__(self):
+        self.name = "Rogue"
+        self.ac = 14
+        self.max_hp = 10
+        self.hp = self.max_hp
+        self.atk_bonus = 5
+        self.damage_die = 6
+        self.alive = True
+        self.turn = True
+
+class Wizard:
+    def __init__(self):
+        self.name = "Wizard"
+        self.ac = 12
+        self.max_hp = 8
+        self.hp = self.max_hp
+        self.atk_bonus = 2
+        self.damage_die = 6
+        self.damage_bonus = 0
+        self.alive = True
+        self.turn = True
+
+class Cleric:
+    def __init__(self):
+        self.name = "Cleric"
+        self.ac = 16
+        self.max_hp = 10
+        self.hp = self.max_hp
+        self.atk_bonus = 4
+        self.damage_die = 6
+        self.damage_bonus = 2
+        self.alive = True
+        self.turn = True
+
+
 def main():
     encounter = test_encounter()
     while True:
         print_battle_screen(encounter)
         print_selection_screen(encounter)
-        selection = input("Make a selection: \nAttack: a\n")
-
-        if selection.casefold() == "a":
+        while True:
             char_select(encounter)
-
+            if all(characters.turn == False for characters in encounter.party):
+                break
+        enemy_round(encounter)
 
 
 if __name__ == "__main__":
