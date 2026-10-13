@@ -1,0 +1,187 @@
+import random
+
+BATTLE_SCREEN_WIDTH = 60
+BATTLE_SCREEN_HEIGHT = 10
+horiz_char = "="
+vert_char = "|"
+SELECT_SCREEN_WIDTH = 60
+SELECT_SCREEN_HEIGHT = 5
+CRITICAL_ROLL = 20
+
+def print_battle_screen(encounter):
+    battle_grid = [[" " for i in range(BATTLE_SCREEN_WIDTH)] for i in range(BATTLE_SCREEN_HEIGHT)]
+
+    # team positions on grid
+    battle_grid[2][40] = "F"
+    battle_grid[4][40] = "W"
+    battle_grid[6][40] = "R"
+    battle_grid[8][40] = "C"
+
+    # enemy positions on grid
+    battle_grid[2][20] = "B"
+    battle_grid[4][20] = "B" # 420 :^)
+    battle_grid[6][20] = "B"
+    battle_grid[8][20] = "B"
+
+    border = " " + horiz_char * (BATTLE_SCREEN_WIDTH + 1)
+    print(border)
+
+    for row in battle_grid:
+        print("|" + "".join(row) + "|")
+    
+    print(border)
+
+def print_selection_screen(encounter):
+   select_grid = [[" " for i in range(SELECT_SCREEN_WIDTH)] for i in range(SELECT_SCREEN_HEIGHT)]
+
+   # enemy information
+   enemy_name = "Bandit"
+   num_enemies = "x4"
+
+   select_grid[0][1:1 + len(enemy_name)] = list(enemy_name)
+   select_grid[0][27:27 + len(num_enemies)] = list(num_enemies)
+
+   # ally information
+   ally_name1 = "Fighter"
+   ally_name2 = "Wizard"
+   ally_name3 = "Rogue"
+   ally_name4 = "Cleric"
+
+   select_grid[0][32:32 + len(ally_name1)] = list(ally_name1)
+   select_grid[1][32:32 + len(ally_name2)] = list(ally_name2)
+   select_grid[2][32:32 + len(ally_name3)] = list(ally_name3)
+   select_grid[3][32:32 + len(ally_name4)] = list(ally_name4)
+   
+   # separator line
+   select_grid[0][30] = "|"
+   select_grid[1][30] = "|"
+   select_grid[2][30] = "|"
+   select_grid[3][30] = "|"
+   select_grid[4][30] = "|"
+
+   border = " " + horiz_char * (SELECT_SCREEN_WIDTH + 1)
+   print(border)
+
+   for row in select_grid:
+       print("|" + "".join(row) + "|")
+
+   print(border)
+
+def char_select(encounter):
+    
+    while True:
+        char_selection = input("Select character to make an attack: ").strip().casefold()
+        conf_char_selection = None
+            
+        for character in encounter.party:
+            if character.name.casefold() == char_selection:
+                conf_char_selection = character
+                break
+        if conf_char_selection is None:
+            print("Character not found.")
+            continue
+            
+        if conf_char_selection.alive == False:
+            print(f"{conf_char_selection.name} is dead!")
+            continue
+        if conf_char_selection.turn == False:
+            print(f"{conf_char_selection.name} can't attack twice in one round!")
+            continue
+            
+        break
+    
+    while True:
+        enemy_selection = input("Select enemy to attack: ").strip().casefold()
+        conf_enemy_selection = None
+
+        for enemy in encounter.enemies:
+            if enemy.name.casefold() == enemy_selection:
+                conf_enemy_selection = enemy
+                break
+        if conf_enemy_selection is None:
+            print("Enemy not found.")   
+            continue
+        if conf_enemy_selection.alive == False:
+            print(f"{conf_enemy_selection.name} is dead!")
+            continue
+            
+        break
+
+    attack(conf_char_selection, conf_enemy_selection)
+
+def attack(attacker, defender):
+    attacker.turn = False
+    atk_roll = random.randint(1, 20)
+
+    if atk_roll == CRITICAL_ROLL:
+        damage_roll1 = random.randint(1, attacker.damage_die)
+        damage_roll2 = random.randint(1, attacker.damage_die)
+        final_damage = damage_roll1 + damage_roll2 + attacker.damage_bonus
+        
+        defender.hp -= final_damage
+        print(f"Critical hit! Damage: {damage_roll1} + {damage_roll2} + {attacker.damage_bonus} = {final_damage}")
+        if defender.hp <= 0:
+            defender.alive = False
+            print(f"{defender.name} is dead!")
+    
+    elif atk_roll >= defender.ac:
+        damage = random.randint(1, attacker.damage_die)
+        final_damage = damage + attacker.damage_bonus
+        defender.hp -= final_damage
+        print(f"Hit! Damage: {damage} + {attacker.damage_bonus} = {final_damage}")
+        if defender.hp <= 0:
+            defender.alive = False
+            print(f"{defender.name} is dead!")
+
+    else:
+        print("Miss!")
+
+
+class Encounter:
+    def __init__(self, party, enemies):
+        self.party = party
+        self.enemies = enemies
+        
+def test_encounter():
+    return Encounter (
+            party = [Fighter()],
+            enemies = [Bandit(), Bandit()]
+        )
+
+class Bandit:
+    def __init__(self):
+        self.name = "Bandit"
+        self.ac = 12
+        self.max_hp = 11
+        self.hp = self.max_hp
+        self.atk_bonus = 3
+        self.damage_die = 6
+        self.damange_bonus = 1
+        self.alive = True
+        self.turn = True
+
+class Fighter:
+    def __init__(self):
+        self.name = "Fighter"
+        self.ac = 16
+        self.max_hp = 13
+        self.hp = self.max_hp
+        self.atk_bonus = 5
+        self.damage_die = 8
+        self.damage_bonus = 5
+        self.alive = True
+        self.turn = True
+def main():
+    encounter = test_encounter()
+    while True:
+        print_battle_screen(encounter)
+        print_selection_screen(encounter)
+        selection = input("Make a selection: \nAttack: a\n")
+
+        if selection.casefold() == "a":
+            char_select(encounter)
+
+
+
+if __name__ == "__main__":
+    main()
