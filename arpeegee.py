@@ -32,41 +32,34 @@ def print_battle_screen(encounter):
     
     print(border)
 
-def print_selection_screen(encounter):
-   select_grid = [[" " for i in range(SELECT_SCREEN_WIDTH)] for i in range(SELECT_SCREEN_HEIGHT)]
+def print_battle_screen(encounter):
+    # Initialize blank battle grid
+    battle_grid = [[" " for _ in range(BATTLE_SCREEN_WIDTH)] for _ in range(BATTLE_SCREEN_HEIGHT)]
 
-   # enemy information
-   enemy_name = "Bandit"
-   num_enemies = "x4"
+    # Draw active party members on the right side
+    party_col = 40
+    for idx, member in enumerate(encounter.party):
+        if member.hp > 0:
+            row = 2 + (idx * 2)  # Rows 2, 4, 6, 8
+            if row < BATTLE_SCREEN_HEIGHT:
+                battle_grid[row][party_col] = member.char
 
-   select_grid[0][1:1 + len(enemy_name)] = list(enemy_name)
-   select_grid[0][27:27 + len(num_enemies)] = list(num_enemies)
+    # Draw active enemies on the left side
+    enemy_col = 20
+    for idx, enemy in enumerate(encounter.enemies):
+        if enemy.hp > 0:
+            row = 2 + (idx * 2)  # Rows 2, 4, 6, 8
+            if row < BATTLE_SCREEN_HEIGHT:
+                battle_grid[row][enemy_col] = enemy.char
 
-   # ally information
-   ally_name1 = "Fighter"
-   ally_name2 = "Wizard"
-   ally_name3 = "Rogue"
-   ally_name4 = "Cleric"
+    # Render borders and rows to terminal
+    border = " " + horiz_char * (BATTLE_SCREEN_WIDTH + 1)
+    print(border)
 
-   select_grid[0][32:32 + len(ally_name1)] = list(ally_name1)
-   select_grid[1][32:32 + len(ally_name2)] = list(ally_name2)
-   select_grid[2][32:32 + len(ally_name3)] = list(ally_name3)
-   select_grid[3][32:32 + len(ally_name4)] = list(ally_name4)
-   
-   # separator line
-   select_grid[0][30] = "|"
-   select_grid[1][30] = "|"
-   select_grid[2][30] = "|"
-   select_grid[3][30] = "|"
-   select_grid[4][30] = "|"
-
-   border = " " + horiz_char * (SELECT_SCREEN_WIDTH + 1)
-   print(border)
-
-   for row in select_grid:
-       print("|" + "".join(row) + "|")
-
-   print(border)
+    for row in battle_grid:
+        print("|" + "".join(row) + "|")
+    
+    print(border)
 
 def char_select(encounter):
     
@@ -182,6 +175,7 @@ class Bandit:
         self.damange_bonus = 1
         self.alive = True
         self.turn = True
+        self.char = "B"
 
 class Fighter:
     def __init__(self):
@@ -194,6 +188,7 @@ class Fighter:
         self.damage_bonus = 5
         self.alive = True
         self.turn = True
+        self.char = "F"
 
 class Rogue:
     def __init__(self):
@@ -217,6 +212,7 @@ class Wizard:
         self.damage_bonus = 0
         self.alive = True
         self.turn = True
+        self.char = "W"
 
 class Cleric:
     def __init__(self):
@@ -229,7 +225,7 @@ class Cleric:
         self.damage_bonus = 2
         self.alive = True
         self.turn = True
-
+        self.char = "C"
 
 def main():
     encounter = test_encounter()
