@@ -200,6 +200,7 @@ class Rogue:
         self.damage_die = 6
         self.alive = True
         self.turn = True
+        self.char = "R"
 
 class Wizard:
     def __init__(self):
