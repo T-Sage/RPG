@@ -9,28 +9,28 @@ SELECT_SCREEN_WIDTH = 60
 SELECT_SCREEN_HEIGHT = 5
 CRITICAL_ROLL = 20
 
-def print_battle_screen(encounter):
-    battle_grid = [[" " for i in range(BATTLE_SCREEN_WIDTH)] for i in range(BATTLE_SCREEN_HEIGHT)]
+# def print_battle_screen(encounter):
+#     battle_grid = [[" " for i in range(BATTLE_SCREEN_WIDTH)] for i in range(BATTLE_SCREEN_HEIGHT)]
 
-    # team positions on grid
-    battle_grid[2][40] = "F"
-    battle_grid[4][40] = "W"
-    battle_grid[6][40] = "R"
-    battle_grid[8][40] = "C"
+#     # team positions on grid
+#     battle_grid[2][40] = "F"
+#     battle_grid[4][40] = "W"
+#     battle_grid[6][40] = "R"
+#     battle_grid[8][40] = "C"
 
-    # enemy positions on grid
-    battle_grid[2][20] = "B"
-    battle_grid[4][20] = "B" # 420 :^)
-    battle_grid[6][20] = "B"
-    battle_grid[8][20] = "B"
+#     # enemy positions on grid
+#     battle_grid[2][20] = "B"
+#     battle_grid[4][20] = "B" # 420 :^)
+#     battle_grid[6][20] = "B"
+#     battle_grid[8][20] = "B"
 
-    border = " " + horiz_char * (BATTLE_SCREEN_WIDTH + 1)
-    print(border)
+#     border = " " + horiz_char * (BATTLE_SCREEN_WIDTH + 1)
+#     print(border)
 
-    for row in battle_grid:
-        print("|" + "".join(row) + "|")
+#     for row in battle_grid:
+#         print("|" + "".join(row) + "|")
     
-    print(border)
+#     print(border)
 
 def print_battle_screen(encounter):
     # Initialize blank battle grid
