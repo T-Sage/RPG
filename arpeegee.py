@@ -68,20 +68,25 @@ def print_selection_screen(encounter):
 
    print(border)
 
+# char_select takes user input for the character they want to attack with and the enemy they want to attack
+# once input is confirmed and potential misinputs are resolved, char_select sends its selections to attack()
 def char_select(encounter):
     
+    # take input from user
     while True:
-        char_selection = input("Select character to make an attack: ").strip().casefold()
+        char_selection = input("Select character to make an attack:\n>").strip().casefold()
         conf_char_selection = None
-            
+        
+        # if the input matches a character name in the party, lock in selection and proceed
         for character in encounter.party:
             if character.name.casefold() == char_selection:
                 conf_char_selection = character
                 break
+
+        # error handling for outlier situations
         if conf_char_selection is None:
             print("Character not found.")
-            continue
-            
+            continue 
         if conf_char_selection.alive == False:
             print(f"{conf_char_selection.name} is dead!")
             continue
@@ -90,45 +95,55 @@ def char_select(encounter):
             continue
             
         break
-    
-    while True: #todo: implement enemy selection from duplicates
-        enemy_selection = input("Select enemy to attack: ").strip().casefold()
+
+    # take input from user
+    while True:
+        enemy_selection = input("Select enemy to attack:\n>").strip().casefold()
         conf_enemy_selection = None
 
+        # make a list of names that have a "'name' + #" format 
+        matches = [
+            enemy for enemy in encounter.enemies
+            if enemy.name.casefold().startswith(enemy_selection + " ")
+        ]
+        
+        # if input matches an enemy in the list, proceed to attack phase
         for enemy in encounter.enemies:
             if enemy.name.casefold() == enemy_selection:
                 conf_enemy_selection = enemy
                 break
+        
+        # special case for when user inputs the name of an enemy with duplicates but not the number
+        if conf_enemy_selection is None and matches:
+            number = input(f"Which {enemy_selection}? Type a number:\n>").strip()
+
+            # check if input is actually a number 
+            if not number.isdigit():
+                print("Enter a valid number.")
+                continue
+
+            enemy_selection = f"{enemy_selection} {number}"
+
+            # lock in corrected input and proceed to attack phase
+            for enemy in encounter.enemies:
+                if enemy.name.casefold() == enemy_selection:
+                    conf_enemy_selection = enemy
+                    break
+
         if conf_enemy_selection is None:
             print("Enemy not found.")   
             continue
+
         if conf_enemy_selection.alive == False:
             print(f"{conf_enemy_selection.name} is dead!")
             continue
-        enemy_enumerator(encounter)    
         break
 
     attack(conf_char_selection, conf_enemy_selection)
 
-def enemy_enumerator(encounter):
-    # current work in progress 
-    counts = Counter(enemy.name.casefold() for enemy in encounter.enemies)
-    enemy_choices = {}
-    name_counts = {}
 
-    for enemy in encounter.enemies:
-        key = enemy.name.casefold()
-
-        if counts[key] > 1:
-            name_counts[key] = name_counts.get(key, 0) + 1
-            label = f"{enemy.name} {name_counts[key]}"
-        else:
-            label = enemy.name
-
-        enemy_choices[label.casefold()] = enemy
-
-    return enemy_choices
-
+# attack takes two characters as input, one attacker and one defender. first, the function sets the attacker's turn to false, then the function rolls a random number 1-20.
+# if the roll is 20, the attacker critically hits. else if the roll is under 20 but still exceeds defender's ac, the attack hits. else the roll is less than the defender's ac, and the attacker misses
 def attack(attacker, defender):
     attacker.turn = False
     atk_roll = random.randint(1, 20)
@@ -139,22 +154,28 @@ def attack(attacker, defender):
         final_damage = damage_roll1 + damage_roll2 + attacker.damage_bonus
         
         defender.hp -= final_damage
-        print(f"{atk_roll} Critical hit! Damage: {damage_roll1} + {damage_roll2} + {attacker.damage_bonus} = {final_damage}")
+        # enemy health print statement is for debug, it is intended to be removed
+        print(f"{defender.name} curr hp = {defender.hp}")
+        print(f"{attacker.name} rolled a {atk_roll}! Critical hit! Damage: {damage_roll1} + {damage_roll2} + {attacker.damage_bonus} = {final_damage}")
         if defender.hp <= 0:
             defender.alive = False
             print(f"{defender.name} is dead!")
     
-    elif atk_roll >= defender.ac:
+    elif atk_roll + attacker.atk_bonus >= defender.ac:
         damage = random.randint(1, attacker.damage_die)
         final_damage = damage + attacker.damage_bonus
         defender.hp -= final_damage
-        print(f"{atk_roll} Hit! Damage: {damage} + {attacker.damage_bonus} = {final_damage}")
+        print(f"{attacker.name} rolled a {atk_roll} + {attacker.atk_bonus}! Hit! Damage: {damage} + {attacker.damage_bonus} = {final_damage}")
+        # enemy health print statement is for debug purposes only, and is intended to be removed in later iterations
+        print(f"{defender.name} curr hp = {defender.hp}")
         if defender.hp <= 0:
             defender.alive = False
             print(f"{defender.name} is dead!")
 
     else:
-        print(f"{atk_roll} Miss!")
+        print(f"{attacker.name} rolled a {atk_roll}! Miss!")
+
+
 #enemy_round iterates through each enemy in the encounter enemy list, decides a random target for them to attack, and then has the enemy attack that target.
 #After all enemies attack, the round restarts, and the .turn property of all characters and enemies are reset to true.
 def enemy_round(encounter):
@@ -179,18 +200,30 @@ def enemy_round(encounter):
     for enemy in encounter.enemies:
         enemy.turn = True
 
-            
-            
 
+# enumerate_enemies adds a space followed by an integer to the name string of an enemy
+# for each duplicate enemy in the list of enemies of an encounter, starting from 1
+def enumerate_enemies(enemies):
+    counts = Counter(type(enemy).__name__ for enemy in enemies)
+    seen = Counter()
 
+    for enemy in enemies:
+        enemy_type = type(enemy).__name__
+        seen[enemy_type] += 1
 
-
-
+        if counts[enemy_type] == 1:
+            enemy.name = enemy_type
+        else:
+            enemy.name = f"{enemy_type} {seen[enemy_type]}"
+    #delete when not needed for debug
+    for enemy in enemies:
+        print(enemy.name)
 
 class Encounter:
     def __init__(self, party, enemies):
         self.party = party
         self.enemies = enemies
+        self.complete = False
         
 def test_encounter():
     return Encounter (
@@ -260,16 +293,44 @@ class Cleric:
 
 
 def main():
+    # load encounter and enumerate duplicate enemies
     encounter = test_encounter()
+    enumerate_enemies(encounter.enemies)
+    
+    # core game loop
     while True:
+
+        # check if the encounter is complete, if it is break
+        if encounter.complete == True:
+            break
+
+        # print the screens
+        # NOTE todo: finish making screens so they reflect gamestate data
         print_battle_screen(encounter)
         print_selection_screen(encounter)
+
+        # attack and defend loop. at any point in the loop if all enemies are dead,
+        # set encounter to complete and break
         while True:
+            if all(enemies.alive == False for enemies in encounter.enemies):
+                encounter.complete = True
+                break
+            # select a character to attack
             char_select(encounter)
+            # if all party members have taken their turn, proceed to enemy round
             if all(characters.turn == False for characters in encounter.party):
                 break
+        # win condition check
+        if all(enemies.alive == False for enemies in encounter.enemies):
+            encounter.complete = True
+            break
+        # enemy round
         enemy_round(encounter)
 
+        # reset party member turns for next player round
+        all(characters.turn == True for characters in encounter.party)
+
+    print("You win!")
 
 if __name__ == "__main__":
     main()
