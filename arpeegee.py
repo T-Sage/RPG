@@ -139,7 +139,7 @@ def attack(attacker, defender):
         final_damage = damage_roll1 + damage_roll2 + attacker.damage_bonus
         
         defender.hp -= final_damage
-        print(f"Critical hit! Damage: {damage_roll1} + {damage_roll2} + {attacker.damage_bonus} = {final_damage}")
+        print(f"{atk_roll} Critical hit! Damage: {damage_roll1} + {damage_roll2} + {attacker.damage_bonus} = {final_damage}")
         if defender.hp <= 0:
             defender.alive = False
             print(f"{defender.name} is dead!")
@@ -148,15 +148,42 @@ def attack(attacker, defender):
         damage = random.randint(1, attacker.damage_die)
         final_damage = damage + attacker.damage_bonus
         defender.hp -= final_damage
-        print(f"Hit! Damage: {damage} + {attacker.damage_bonus} = {final_damage}")
+        print(f"{atk_roll} Hit! Damage: {damage} + {attacker.damage_bonus} = {final_damage}")
         if defender.hp <= 0:
             defender.alive = False
             print(f"{defender.name} is dead!")
 
     else:
-        print("Miss!")
+        print(f"{atk_roll} Miss!")
+#enemy_round iterates through each enemy in the encounter enemy list, decides a random target for them to attack, and then has the enemy attack that target.
+#After all enemies attack, the round restarts, and the .turn property of all characters and enemies are reset to true.
+def enemy_round(encounter):
+    #every enemy is going to make an attack
+    for enemy in encounter.enemies:
+        #if enemy is alive and has not gone
+        if enemy.alive == True and enemy.turn == True:
+            #create a list of the valid targets by their index in the party list
+            valid_targets = []
+            #Check every party member in the list, if they are alive, add them to the valid target list. valid_targets is a list of the indexes of valid targets in the party list. 
+            for index, character in enumerate(encounter.party):
+                if character.alive == True:
+                    valid_targets.append(index)
+            #Target is assigned an index from the party member list, randomly selected from the valid targets.
+            target = valid_targets[random.randint(0,len(valid_targets)-1)]
+            #encounter.party[target] is the party member being attacked
+            print(f"{enemy.name} is attacking {encounter.party[target].name}")
+            attack(enemy, encounter.party[target])
+    #after all enemy attacks happen, reset all .turn properties, as a new round is occuring
+    for character in encounter.party:
+        character.turn = True
+    for enemy in encounter.enemies:
+        enemy.turn = True
 
-#def enemy_round(encounter):
+            
+            
+
+
+
 
 
 
@@ -179,7 +206,7 @@ class Bandit:
         self.hp = self.max_hp
         self.atk_bonus = 3
         self.damage_die = 6
-        self.damange_bonus = 1
+        self.damage_bonus = 1
         self.alive = True
         self.turn = True
 
@@ -203,6 +230,7 @@ class Rogue:
         self.hp = self.max_hp
         self.atk_bonus = 5
         self.damage_die = 6
+        self.damage_bonus = 5
         self.alive = True
         self.turn = True
 
