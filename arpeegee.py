@@ -1,5 +1,6 @@
 import random
 from collections import Counter
+import time
 
 BATTLE_SCREEN_WIDTH = 60
 BATTLE_SCREEN_HEIGHT = 10
@@ -179,6 +180,8 @@ def attack(attacker, defender):
 #enemy_round iterates through each enemy in the encounter enemy list, decides a random target for them to attack, and then has the enemy attack that target.
 #After all enemies attack, the round restarts, and the .turn property of all characters and enemies are reset to true.
 def enemy_round(encounter):
+    print(f"The enemies take their turn.")
+    time.sleep(1)
     #every enemy is going to make an attack
     for enemy in encounter.enemies:
         #if enemy is alive and has not gone
@@ -193,12 +196,16 @@ def enemy_round(encounter):
             target = valid_targets[random.randint(0,len(valid_targets)-1)]
             #encounter.party[target] is the party member being attacked
             print(f"{enemy.name} is attacking {encounter.party[target].name}")
+            time.sleep(1)
             attack(enemy, encounter.party[target])
+            time.sleep(1)
     #after all enemy attacks happen, reset all .turn properties, as a new round is occuring
     for character in encounter.party:
         character.turn = True
     for enemy in encounter.enemies:
         enemy.turn = True
+    print(f"Enemy turn over.")
+    time.sleep(1)
 
 
 # enumerate_enemies adds a space followed by an integer to the name string of an enemy
