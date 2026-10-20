@@ -103,6 +103,42 @@ def char_select(encounter):
 
     attack(conf_char_selection, conf_enemy_selection)
 
+def print_selection_screen(encounter):
+   select_grid = [[" " for i in range(SELECT_SCREEN_WIDTH)] for i in range(SELECT_SCREEN_HEIGHT)]
+
+   # enemy information
+   enemy_name = "Bandit"
+   num_enemies = "x4"
+
+   select_grid[0][1:1 + len(enemy_name)] = list(enemy_name)
+   select_grid[0][27:27 + len(num_enemies)] = list(num_enemies)
+
+   # ally information
+   ally_name1 = "Fighter"
+   ally_name2 = "Wizard"
+   ally_name3 = "Rogue"
+   ally_name4 = "Cleric"
+
+   select_grid[0][32:32 + len(ally_name1)] = list(ally_name1)
+   select_grid[1][32:32 + len(ally_name2)] = list(ally_name2)
+   select_grid[2][32:32 + len(ally_name3)] = list(ally_name3)
+   select_grid[3][32:32 + len(ally_name4)] = list(ally_name4)
+   
+   # separator line
+   select_grid[0][30] = "|"
+   select_grid[1][30] = "|"
+   select_grid[2][30] = "|"
+   select_grid[3][30] = "|"
+   select_grid[4][30] = "|"
+
+   border = " " + horiz_char * (SELECT_SCREEN_WIDTH + 1)
+   print(border)
+
+   for row in select_grid:
+       print("|" + "".join(row) + "|")
+
+   print(border)
+
 def enemy_enumerator(encounter):
     # current work in progress 
     counts = Counter(enemy.name.casefold() for enemy in encounter.enemies)
