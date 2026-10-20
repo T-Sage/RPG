@@ -230,6 +230,7 @@ class Encounter:
     def __init__(self, party, enemies):
         self.party = party
         self.enemies = enemies
+        self.win = False
         self.complete = False
         
 def test_encounter():
@@ -320,15 +321,17 @@ def main():
         # set encounter to complete and break
         while True:
             if all(enemies.alive == False for enemies in encounter.enemies):
+                encounter.win = True
                 encounter.complete = True
                 break
             # select a character to attack
             char_select(encounter)
             # if all party members have taken their turn, proceed to enemy round
-            if all(characters.turn == False for characters in encounter.party):
+            if all(characters.turn == False or characters.alive == False for characters in encounter.party):
                 break
         # win condition check
         if all(enemies.alive == False for enemies in encounter.enemies):
+            encounter.win = True
             encounter.complete = True
             break
         # enemy round
@@ -336,8 +339,10 @@ def main():
 
         # reset party member turns for next player round
         all(characters.turn == True for characters in encounter.party)
-
-    print("You win!")
+    if encounter.win == True:
+        print("You win!")
+    else:
+        print("You Lose.")
 
 if __name__ == "__main__":
     main()
