@@ -10,21 +10,50 @@ SELECT_SCREEN_WIDTH = 60
 SELECT_SCREEN_HEIGHT = 5
 CRITICAL_ROLL = 20
 
+# def print_battle_screen(encounter):
+#     battle_grid = [[" " for i in range(BATTLE_SCREEN_WIDTH)] for i in range(BATTLE_SCREEN_HEIGHT)]
+
+#     # team positions on grid
+#     battle_grid[2][40] = "F"
+#     battle_grid[4][40] = "W"
+#     battle_grid[6][40] = "R"
+#     battle_grid[8][40] = "C"
+
+#     # enemy positions on grid
+#     battle_grid[2][20] = "B"
+#     battle_grid[4][20] = "B" # 420 :^)
+#     battle_grid[6][20] = "B"
+#     battle_grid[8][20] = "B"
+
+#     border = " " + horiz_char * (BATTLE_SCREEN_WIDTH + 1)
+#     print(border)
+
+#     for row in battle_grid:
+#         print("|" + "".join(row) + "|")
+    
+#     print(border)
+
 def print_battle_screen(encounter):
-    battle_grid = [[" " for i in range(BATTLE_SCREEN_WIDTH)] for i in range(BATTLE_SCREEN_HEIGHT)]
+    # Initialize blank battle grid
+    battle_grid = [[" " for _ in range(BATTLE_SCREEN_WIDTH)] for _ in range(BATTLE_SCREEN_HEIGHT)]
 
-    # team positions on grid
-    battle_grid[2][40] = "F"
-    battle_grid[4][40] = "W"
-    battle_grid[6][40] = "R"
-    battle_grid[8][40] = "C"
+    # Draw active party members on the right side
+    party_col = 40
+    for idx, member in enumerate(encounter.party):
+        if member.hp > 0:
+            row = 2 + (idx * 2)  # Rows 2, 4, 6, 8
+            if row < BATTLE_SCREEN_HEIGHT:
+                battle_grid[row][party_col] = member.char
 
-    # enemy positions on grid
-    battle_grid[2][20] = "B"
-    battle_grid[4][20] = "B" # 420 :^)
-    battle_grid[6][20] = "B"
-    battle_grid[8][20] = "B"
+    # Draw active enemies on the left side
+    enemy_col = 20
+    for idx, enemy in enumerate(encounter.enemies):
+        if enemy.hp > 0:
+            row = 2 + (idx * 2)  # Rows 2, 4, 6, 8
+            if row < BATTLE_SCREEN_HEIGHT:
+                battle_grid[row][enemy_col] = enemy.char
 
+    # Render borders and rows to terminal
     border = " " + horiz_char * (BATTLE_SCREEN_WIDTH + 1)
     print(border)
 
@@ -250,6 +279,7 @@ class Bandit:
         self.damage_bonus = 1
         self.alive = True
         self.turn = True
+        self.char = "B"
 
 class Fighter:
     def __init__(self):
@@ -262,6 +292,7 @@ class Fighter:
         self.damage_bonus = 5
         self.alive = True
         self.turn = True
+        self.char = "F"
 
 class Rogue:
     def __init__(self):
@@ -274,6 +305,7 @@ class Rogue:
         self.damage_bonus = 5
         self.alive = True
         self.turn = True
+        self.char = "R"
 
 class Wizard:
     def __init__(self):
@@ -286,6 +318,7 @@ class Wizard:
         self.damage_bonus = 0
         self.alive = True
         self.turn = True
+        self.char = "W"
 
 class Cleric:
     def __init__(self):
@@ -298,7 +331,7 @@ class Cleric:
         self.damage_bonus = 2
         self.alive = True
         self.turn = True
-
+        self.char = "C"
 
 def main():
     # load encounter and enumerate duplicate enemies
