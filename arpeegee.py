@@ -333,6 +333,24 @@ class Cleric:
         self.turn = True
         self.char = "C"
 
+class Weapon:
+    def __init__(self, name, attack_bonus):
+        self.name = name
+        self.attack_bonus = attack_bonus
+
+# Example weapon subclasses
+class IronSword(Weapon):
+    def __init__(self):
+        super().__init__("Iron Sword", 5)
+
+class WoodenStaff(Weapon):
+    def __init__(self):
+        super().__init__("Wooden Staff", 2)
+
+class Dagger(Weapon):
+    def __init__(self):
+        super().__init__("Dagger", 4)
+
 def main():
     # load encounter and enumerate duplicate enemies
     encounter = test_encounter()
