@@ -334,22 +334,31 @@ class Cleric:
         self.char = "C"
 
 class Weapon:
-    def __init__(self, name, attack_bonus):
+    def __init__(self, name, bonus_atk, bonus_dmg_die, bonus_dmg):
         self.name = name
-        self.attack_bonus = attack_bonus
+        self.bonus_atk = bonus_atk
+        self.bonus_dmg_die = bonus_dmg_die
+        self.bonus_dmg = bonus_dmg
 
 # Example weapon subclasses
-class IronSword(Weapon):
-    def __init__(self):
-        super().__init__("Iron Sword", 5)
+# class IronSword(Weapon):
+#     def __init__(self):
+#         super().__init__("Iron Sword", 0, 10, 5)
 
-class WoodenStaff(Weapon):
-    def __init__(self):
-        super().__init__("Wooden Staff", 2)
+# class WoodenStaff(Weapon):
+#     def __init__(self):
+#         super().__init__("Wooden Staff", 0, 10, 2)
 
-class Dagger(Weapon):
-    def __init__(self):
-        super().__init__("Dagger", 4)
+# class Dagger(Weapon):
+#     def __init__(self):
+#         super().__init__("Dagger", 0, 10, 4)
+        
+# Function to equip a weapon to any of your teammate's character objects
+def equip_weapon(character, weapon):
+    character.atk_bonus += weapon.bonus_atk
+    character.damage_die = weapon.bonus_dmg_die
+    character.damage_bonus += weapon.bonus_dmg
+    print(f"{character.name} equipped the {weapon.name}!")
 
 def main():
     # load encounter and enumerate duplicate enemies
