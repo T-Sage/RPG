@@ -10,21 +10,50 @@ SELECT_SCREEN_WIDTH = 60
 SELECT_SCREEN_HEIGHT = 5
 CRITICAL_ROLL = 20
 
+# def print_battle_screen(encounter):
+#     battle_grid = [[" " for i in range(BATTLE_SCREEN_WIDTH)] for i in range(BATTLE_SCREEN_HEIGHT)]
+
+#     # team positions on grid
+#     battle_grid[2][40] = "F"
+#     battle_grid[4][40] = "W"
+#     battle_grid[6][40] = "R"
+#     battle_grid[8][40] = "C"
+
+#     # enemy positions on grid
+#     battle_grid[2][20] = "B"
+#     battle_grid[4][20] = "B" # 420 :^)
+#     battle_grid[6][20] = "B"
+#     battle_grid[8][20] = "B"
+
+#     border = " " + horiz_char * (BATTLE_SCREEN_WIDTH + 1)
+#     print(border)
+
+#     for row in battle_grid:
+#         print("|" + "".join(row) + "|")
+    
+#     print(border)
+
 def print_battle_screen(encounter):
-    battle_grid = [[" " for i in range(BATTLE_SCREEN_WIDTH)] for i in range(BATTLE_SCREEN_HEIGHT)]
+    # Initialize blank battle grid
+    battle_grid = [[" " for _ in range(BATTLE_SCREEN_WIDTH)] for _ in range(BATTLE_SCREEN_HEIGHT)]
 
-    # team positions on grid
-    battle_grid[2][40] = "F"
-    battle_grid[4][40] = "W"
-    battle_grid[6][40] = "R"
-    battle_grid[8][40] = "C"
+    # Draw active party members on the right side
+    party_col = 40
+    for idx, member in enumerate(encounter.party):
+        if member.hp > 0:
+            row = 2 + (idx * 2)  # Rows 2, 4, 6, 8
+            if row < BATTLE_SCREEN_HEIGHT:
+                battle_grid[row][party_col] = member.char
 
-    # enemy positions on grid
-    battle_grid[2][20] = "B"
-    battle_grid[4][20] = "B" # 420 :^)
-    battle_grid[6][20] = "B"
-    battle_grid[8][20] = "B"
+    # Draw active enemies on the left side
+    enemy_col = 20
+    for idx, enemy in enumerate(encounter.enemies):
+        if enemy.hp > 0:
+            row = 2 + (idx * 2)  # Rows 2, 4, 6, 8
+            if row < BATTLE_SCREEN_HEIGHT:
+                battle_grid[row][enemy_col] = enemy.char
 
+    # Render borders and rows to terminal
     border = " " + horiz_char * (BATTLE_SCREEN_WIDTH + 1)
     print(border)
 
@@ -250,6 +279,7 @@ class Bandit:
         self.damage_bonus = 1
         self.alive = True
         self.turn = True
+        self.char = "B"
 
 class Fighter:
     def __init__(self):
@@ -262,6 +292,7 @@ class Fighter:
         self.damage_bonus = 5
         self.alive = True
         self.turn = True
+        self.char = "F"
 
 class Rogue:
     def __init__(self):
@@ -274,6 +305,7 @@ class Rogue:
         self.damage_bonus = 5
         self.alive = True
         self.turn = True
+        self.char = "R"
 
 class Wizard:
     def __init__(self):
@@ -286,6 +318,7 @@ class Wizard:
         self.damage_bonus = 0
         self.alive = True
         self.turn = True
+        self.char = "W"
 
 class Cleric:
     def __init__(self):
@@ -298,7 +331,34 @@ class Cleric:
         self.damage_bonus = 2
         self.alive = True
         self.turn = True
+        self.char = "C"
 
+class Weapon:
+    def __init__(self, name, bonus_atk, bonus_dmg_die, bonus_dmg):
+        self.name = name
+        self.bonus_atk = bonus_atk
+        self.bonus_dmg_die = bonus_dmg_die
+        self.bonus_dmg = bonus_dmg
+
+# Example weapon subclasses
+# class IronSword(Weapon):
+#     def __init__(self):
+#         super().__init__("Iron Sword", 0, 10, 5)
+
+# class WoodenStaff(Weapon):
+#     def __init__(self):
+#         super().__init__("Wooden Staff", 0, 10, 2)
+
+# class Dagger(Weapon):
+#     def __init__(self):
+#         super().__init__("Dagger", 0, 10, 4)
+        
+# Function to equip a weapon to any of your teammate's character objects
+def equip_weapon(character, weapon):
+    character.atk_bonus += weapon.bonus_atk
+    character.damage_die = weapon.bonus_dmg_die
+    character.damage_bonus += weapon.bonus_dmg
+    print(f"{character.name} equipped the {weapon.name}!")
 
 def main():
     # load encounter and enumerate duplicate enemies
