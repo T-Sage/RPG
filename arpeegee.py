@@ -98,13 +98,13 @@ def print_selection_screen(encounter):
 
    print(border)
 
-# char_select takes user input for the character they want to attack with and the enemy they want to attack
-# once input is confirmed and potential misinputs are resolved, char_select sends its selections to attack()
+# char_select takes encounter as an argument, and returns a selected character
+# user selects a character they'd like to make an action with using an input string
 def char_select(encounter):
     
     # take input from user
     while True:
-        char_selection = input("Select character to make an attack:\n>").strip().casefold()
+        char_selection = input("Select character to make an action:\n>").strip().casefold()
         conf_char_selection = None
         
         # if the input matches a character name in the party, lock in selection and proceed
@@ -121,33 +121,39 @@ def char_select(encounter):
             print(f"{conf_char_selection.name} is dead!")
             continue
         if conf_char_selection.turn == False:
-            print(f"{conf_char_selection.name} can't attack twice in one round!")
+            print(f"{conf_char_selection.name} can't make an action twice in one round!")
             continue
             
         break
 
+    return conf_char_selection
+
+# enemy_select takes encounter as an argument, and returns a selected enemy
+# the user selects an enemy to attack via user input
+# the user must input an enemy name and a number if there are any duplicates
+def enemy_select(encounter):
     # take input from user
     while True:
         enemy_selection = input("Select enemy to attack:\n>").strip().casefold()
         conf_enemy_selection = None
 
-        # make a list of names that have a "'name' + #" format 
+        # make a list of names that have a "'name' + #" format
         matches = [
             enemy for enemy in encounter.enemies
             if enemy.name.casefold().startswith(enemy_selection + " ")
         ]
-        
+
         # if input matches an enemy in the list, proceed to attack phase
         for enemy in encounter.enemies:
             if enemy.name.casefold() == enemy_selection:
                 conf_enemy_selection = enemy
                 break
-        
+
         # special case for when user inputs the name of an enemy with duplicates but not the number
         if conf_enemy_selection is None and matches:
             number = input(f"Which {enemy_selection}? Type a number:\n>").strip()
 
-            # check if input is actually a number 
+            # check if input is actually a number
             if not number.isdigit():
                 print("Enter a valid number.")
                 continue
@@ -160,16 +166,46 @@ def char_select(encounter):
                     conf_enemy_selection = enemy
                     break
 
+        # case for mis-input
         if conf_enemy_selection is None:
-            print("Enemy not found.")   
+            print("Enemy not found.")
             continue
 
+        # case to handle dead enemy being targeted
         if conf_enemy_selection.alive == False:
             print(f"{conf_enemy_selection.name} is dead!")
             continue
+
         break
 
-    attack(conf_char_selection, conf_enemy_selection)
+    return conf_enemy_selection
+
+def action_select(selected_char, encounter):
+    print(f"" + selected_char.name + "'s available actions:")
+    print("Attack")
+    print("Defend **NOT YET IMPLEMENTED**")
+    #print("Return") # return option should be made available in the future.
+
+    while True:
+        # take input from user
+        selection = input(f"What will " + selected_char.name + " do?\n>").strip().casefold()
+
+        # attack selection case
+        if selection == "attack":
+            # prompt user for the target of their attack
+            target = enemy_select(encounter)
+            # run attack method with user selections
+            attack(selected_char, target)
+            break
+
+        if selection == "defend":
+            print("not yet implemented")
+            continue
+
+        else:
+            print("Selection not recognized")
+            continue
+
 
 
 # attack takes two characters as input, one attacker and one defender. first, the function sets the attacker's turn to false, then the function rolls a random number 1-20.
@@ -368,7 +404,7 @@ def main():
     # core game loop
     while True:
 
-        # check if the encounter is complete, if it is break
+        # check if the encounter is complete. If it is, break
         if encounter.complete == True:
             break
 
@@ -385,7 +421,9 @@ def main():
                 encounter.complete = True
                 break
             # select a character to attack
-            char_select(encounter)
+            selected_char = char_select(encounter)
+            action_select(selected_char, encounter)
+
             # if all party members have taken their turn, proceed to enemy round
             if all(characters.turn == False or characters.alive == False for characters in encounter.party):
                 break
