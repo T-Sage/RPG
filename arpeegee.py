@@ -373,7 +373,7 @@ class Weapon:
         self.bonus_dmg_die = bonus_dmg_die
         self.bonus_dmg = bonus_dmg
 
-Example weapon subclasses
+#Example weapon subclasses
 class IronSword(Weapon):
     def __init__(self):
         super().__init__("Iron Sword", 0, 10, 5)
