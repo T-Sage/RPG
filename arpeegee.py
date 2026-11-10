@@ -280,8 +280,8 @@ def enumerate_enemies(enemies):
         else:
             enemy.name = f"{enemy_type} {seen[enemy_type]}"
     # delete when not needed for debug
-    for enemy in enemies:
-        print(enemy.name)
+    #   for enemy in enemies:
+        #print(enemy.name)
 
 class Encounter:
     def __init__(self, party, enemies):
