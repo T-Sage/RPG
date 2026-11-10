@@ -183,7 +183,7 @@ def enemy_select(encounter):
 def action_select(selected_char, encounter):
     print(f"" + selected_char.name + "'s available actions:")
     print("Attack")
-    print("Defend **NOT YET IMPLEMENTED**")
+    print("Defend")
     #print("Return") # return option should be made available in the future.
 
     while True:
@@ -199,13 +199,17 @@ def action_select(selected_char, encounter):
             break
 
         if selection == "defend":
-            print("not yet implemented")
-            continue
+            defend(selected_char)
+            print(f"{selected_char.name} is defending!")
+            break
 
         else:
             print("Selection not recognized")
             continue
 
+def defend(character):
+    character.defend = True
+    character.turn = False
 
 
 # attack takes two characters as input, one attacker and one defender. first, the function sets the attacker's turn to false, then the function rolls a random number 1-20.
@@ -213,6 +217,15 @@ def action_select(selected_char, encounter):
 def attack(attacker, defender):
     attacker.turn = False
     atk_roll = random.randint(1, 20)
+
+    # hack-ish system for disadvantage. strongly considering adding seperate methods to handle d20 rolls and 
+    # d20 rolls with disadvantage to keep the attack method a little cleaner
+    if defender.defend == True:
+        print(f"{attacker.name} has disadvantage!")
+        atk_roll2 = random.randint(1, 20)
+
+        if atk_roll2 < atk_roll:
+            atk_roll = atk_roll2
 
     if atk_roll == CRITICAL_ROLL:
         damage_roll1 = random.randint(1, attacker.damage_die)
@@ -251,20 +264,21 @@ def enemy_round(encounter):
     for enemy in encounter.enemies:
         #if enemy is alive and has not gone
         if enemy.alive == True and enemy.turn == True:
-            #create a list of the valid targets by their index in the party list
+            # create a list of the valid targets by their index in the party list
             valid_targets = []
-            #Check every party member in the list, if they are alive, add them to the valid target list. valid_targets is a list of the indexes of valid targets in the party list. 
+            # Check every party member in the list, if they are alive, add them to the valid target list
+            # valid_targets is a list of the indexes of valid targets in the party list. 
             for index, character in enumerate(encounter.party):
                 if character.alive == True:
                     valid_targets.append(index)
-            #Target is assigned an index from the party member list, randomly selected from the valid targets.
+            # Target is assigned an index from the party member list, randomly selected from the valid targets.
             target = valid_targets[random.randint(0,len(valid_targets)-1)]
-            #encounter.party[target] is the party member being attacked
+            # encounter.party[target] is the party member being attacked
             print(f"{enemy.name} is attacking {encounter.party[target].name}")
             time.sleep(1)
             attack(enemy, encounter.party[target])
             time.sleep(1)
-    #after all enemy attacks happen, reset all .turn properties, as a new round is occuring
+    # after all enemy attacks happen, reset all .turn properties, as a new round is occuring
     for character in encounter.party:
         character.turn = True
     for enemy in encounter.enemies:
@@ -287,7 +301,7 @@ def enumerate_enemies(enemies):
             enemy.name = enemy_type
         else:
             enemy.name = f"{enemy_type} {seen[enemy_type]}"
-    #delete when not needed for debug
+    # delete when not needed for debug
     for enemy in enemies:
         print(enemy.name)
 
@@ -316,6 +330,7 @@ class Bandit:
         self.alive = True
         self.turn = True
         self.char = "B"
+        self.defend = False
 
 class Fighter:
     def __init__(self):
@@ -329,6 +344,7 @@ class Fighter:
         self.alive = True
         self.turn = True
         self.char = "F"
+        self.defend = False
 
 class Rogue:
     def __init__(self):
@@ -342,6 +358,7 @@ class Rogue:
         self.alive = True
         self.turn = True
         self.char = "R"
+        self.defend = False
 
 class Wizard:
     def __init__(self):
@@ -355,6 +372,7 @@ class Wizard:
         self.alive = True
         self.turn = True
         self.char = "W"
+        self.defend = False
 
 class Cleric:
     def __init__(self):
@@ -368,6 +386,7 @@ class Cleric:
         self.alive = True
         self.turn = True
         self.char = "C"
+        self.defend = False
 
 class Weapon:
     def __init__(self, name, bonus_atk, bonus_dmg_die, bonus_dmg):
@@ -420,7 +439,7 @@ def main():
                 encounter.win = True
                 encounter.complete = True
                 break
-            # select a character to attack
+            # select a character, and then an action for the selected character
             selected_char = char_select(encounter)
             action_select(selected_char, encounter)
 
@@ -437,6 +456,8 @@ def main():
 
         # reset party member turns for next player round
         all(characters.turn == True for characters in encounter.party)
+        # reset party member defend flag
+        all(characters.defend == False for characters in encounter.party)
     if encounter.win == True:
         print("You win!")
     else:
