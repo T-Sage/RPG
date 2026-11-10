@@ -9,6 +9,8 @@ class Fighter:
         self.damage_bonus = 5
         self.alive = True
         self.turn = True
+        self.char = "F"
+        self.defend = False
 
 class Rogue:
     def __init__(self):
@@ -21,6 +23,8 @@ class Rogue:
         self.damage_bonus = 5
         self.alive = True
         self.turn = True
+        self.char = "R"
+        self.defend = False
 
 class Wizard:
     def __init__(self):
@@ -33,6 +37,8 @@ class Wizard:
         self.damage_bonus = 0
         self.alive = True
         self.turn = True
+        self.char = "W"
+        self.defend = False
 
 class Cleric:
     def __init__(self):
@@ -45,3 +51,5 @@ class Cleric:
         self.damage_bonus = 2
         self.alive = True
         self.turn = True
+        self.char = "C"
+        self.defend = False
