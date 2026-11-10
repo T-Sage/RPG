@@ -415,6 +415,54 @@ def equip_weapon(character, weapon):
     character.damage_bonus += weapon.bonus_dmg
     print(f"{character.name} equipped the {weapon.name}!")
 
+#takes in an encounter object
+def combat(encounter):
+        # load encounter and enumerate duplicate enemies
+    enumerate_enemies(encounter.enemies)
+    
+    # core game loop
+    while True:
+
+        # check if the encounter is complete. If it is, break
+        if encounter.complete == True:
+            break
+
+        # print the screens
+        # NOTE todo: finish making screens so they reflect gamestate data
+        print_battle_screen(encounter)
+        print_selection_screen(encounter)
+
+        # attack and defend loop. at any point in the loop if all enemies are dead,
+        # set encounter to complete and break
+        while True:
+            if all(enemies.alive == False for enemies in encounter.enemies):
+                encounter.win = True
+                encounter.complete = True
+                break
+            # select a character, and then an action for the selected character
+            selected_char = char_select(encounter)
+            action_select(selected_char, encounter)
+
+            # if all party members have taken their turn, proceed to enemy round
+            if all(characters.turn == False or characters.alive == False for characters in encounter.party):
+                break
+        # win condition check
+        if all(enemies.alive == False for enemies in encounter.enemies):
+            encounter.win = True
+            encounter.complete = True
+            break
+        # enemy round
+        enemy_round(encounter)
+
+        # reset party member turns for next player round
+        all(characters.turn == True for characters in encounter.party)
+        # reset party member defend flag
+        all(characters.defend == False for characters in encounter.party)
+    if encounter.win == True:
+        print("You win!")
+    else:
+        print("You Lose.")
+
 def main():
     # load encounter and enumerate duplicate enemies
     encounter = test_encounter()
