@@ -11,70 +11,49 @@ def calc_pb(level: int) -> int:
     return math.ceil(1 + (level / 4))
 
 
-# --- INDIVIDUAL CLASS DEFINITIONS ---
-
-class Wizard:
-    def __init__(self, name: str = "Wizard", level: int = 1, scores: dict = None):
+class Barbarian:
+    def __init__(self, name: str = "Barbarian", level: int = 1, scores: dict = None):
         if scores is None:
-            # Recommended Wizard array: INT high, DEX medium, CON medium
-            scores = {"STR": 8, "DEX": 14, "CON": 12, "INT": 15, "WIS": 12, "CHA": 10}
-
-        int_mod = calc_mod(scores["INT"])
-        dex_mod = calc_mod(scores["DEX"])
-        con_mod = calc_mod(scores["CON"])
-        pb = calc_pb(level)
-
-        # ALL 9 ORIGINAL VARIABLES
-        self.name = name
-        self.ac = 10 + dex_mod  # Unarmored AC[cite: 2]
-        self.max_hp = max(1, 6 + con_mod)  # Hit Die d6 + CON mod[cite: 3]
-        self.hp = self.max_hp
-        self.atk_bonus = pb + int_mod  # Spell Attack Bonus[cite: 4, 5]
-        self.damage_die = 6  # e.g., Fire Bolt / Quarterstaff
-        self.damage_bonus = int_mod
-        self.alive = True
-        self.turn = True
-
-
-class Fighter:
-    def __init__(self, name: str = "Fighter", level: int = 1, scores: dict = None):
-        if scores is None:
-            # Recommended Fighter array: STR high, CON high, DEX medium
-            scores = {"STR": 15, "DEX": 12, "CON": 14, "INT": 8, "WIS": 10, "CHA": 10}
+            scores = {"STR": 15, "DEX": 13, "CON": 14, "INT": 8, "WIS": 12, "CHA": 10}
 
         str_mod = calc_mod(scores["STR"])
+        dex_mod = calc_mod(scores["DEX"])
         con_mod = calc_mod(scores["CON"])
+        int_mod = calc_mod(scores["INT"])
+        wis_mod = calc_mod(scores["WIS"])
+        cha_mod = calc_mod(scores["CHA"])
         pb = calc_pb(level)
 
-        # ALL 9 ORIGINAL VARIABLES
         self.name = name
-        self.ac = 16  # Chain Mail (Heavy Armor)[cite: 2]
-        self.max_hp = max(1, 10 + con_mod)  # Hit Die d10 + CON mod[cite: 3]
+        self.ac = 10 + dex_mod + con_mod
+        self.max_hp = max(1, 12 + con_mod + ((level - 1) * (7 + con_mod)))
         self.hp = self.max_hp
-        self.atk_bonus = pb + str_mod  # Weapon Attack Bonus[cite: 4, 5]
-        self.damage_die = 8  # e.g., Longsword
+        self.atk_bonus = pb + str_mod
+        self.damage_die = 12
         self.damage_bonus = str_mod
         self.alive = True
         self.turn = True
 
 
-class Rogue:
-    def __init__(self, name: str = "Rogue", level: int = 1, scores: dict = None):
+class Bard:
+    def __init__(self, name: str = "Bard", level: int = 1, scores: dict = None):
         if scores is None:
-            # Recommended Rogue array: DEX high, CHA medium, CON medium
-            scores = {"STR": 10, "DEX": 15, "CON": 12, "INT": 12, "WIS": 10, "CHA": 13}
+            scores = {"STR": 8, "DEX": 14, "CON": 12, "INT": 13, "WIS": 10, "CHA": 15}
 
+        str_mod = calc_mod(scores["STR"])
         dex_mod = calc_mod(scores["DEX"])
         con_mod = calc_mod(scores["CON"])
+        int_mod = calc_mod(scores["INT"])
+        wis_mod = calc_mod(scores["WIS"])
+        cha_mod = calc_mod(scores["CHA"])
         pb = calc_pb(level)
 
-        # ALL 9 ORIGINAL VARIABLES
         self.name = name
-        self.ac = 11 + dex_mod  # Leather Armor (Light Armor)[cite: 2]
-        self.max_hp = max(1, 8 + con_mod)  # Hit Die d8 + CON mod[cite: 3]
+        self.ac = 11 + dex_mod
+        self.max_hp = max(1, 8 + con_mod + ((level - 1) * (5 + con_mod)))
         self.hp = self.max_hp
-        self.atk_bonus = pb + dex_mod  # Finesse Weapon Attack Bonus[cite: 4, 5]
-        self.damage_die = 6  # e.g., Shortsword
+        self.atk_bonus = pb + cha_mod
+        self.damage_die = 8
         self.damage_bonus = dex_mod
         self.alive = True
         self.turn = True
@@ -83,21 +62,238 @@ class Rogue:
 class Cleric:
     def __init__(self, name: str = "Cleric", level: int = 1, scores: dict = None):
         if scores is None:
-            # Recommended Cleric array: WIS high, CON medium, STR medium
-            scores = {"STR": 13, "DEX": 10, "CON": 14, "INT": 8, "WIS": 15, "CHA": 12}
+            scores = {"STR": 14, "DEX": 10, "CON": 13, "INT": 8, "WIS": 15, "CHA": 12}
 
-        wis_mod = calc_mod(scores["WIS"])
+        str_mod = calc_mod(scores["STR"])
         dex_mod = calc_mod(scores["DEX"])
         con_mod = calc_mod(scores["CON"])
+        int_mod = calc_mod(scores["INT"])
+        wis_mod = calc_mod(scores["WIS"])
+        cha_mod = calc_mod(scores["CHA"])
         pb = calc_pb(level)
 
-        # ALL 9 ORIGINAL VARIABLES
         self.name = name
-        self.ac = 14 + min(2, dex_mod)  # Scale Mail (Medium Armor)[cite: 2]
-        self.max_hp = max(1, 8 + con_mod)  # Hit Die d8 + CON mod[cite: 3]
+        self.ac = 16 + min(2, dex_mod)
+        self.max_hp = max(1, 8 + con_mod + ((level - 1) * (5 + con_mod)))
         self.hp = self.max_hp
-        self.atk_bonus = pb + wis_mod  # Spell/Weapon Attack Bonus[cite: 4, 5]
-        self.damage_die = 8  # e.g., Mace / Sacred Flame
+        self.atk_bonus = pb + wis_mod
+        self.damage_die = 8
         self.damage_bonus = wis_mod
+        self.alive = True
+        self.turn = True
+
+
+class Druid:
+    def __init__(self, name: str = "Druid", level: int = 1, scores: dict = None):
+        if scores is None:
+            scores = {"STR": 8, "DEX": 12, "CON": 14, "INT": 13, "WIS": 15, "CHA": 10}
+
+        str_mod = calc_mod(scores["STR"])
+        dex_mod = calc_mod(scores["DEX"])
+        con_mod = calc_mod(scores["CON"])
+        int_mod = calc_mod(scores["INT"])
+        wis_mod = calc_mod(scores["WIS"])
+        cha_mod = calc_mod(scores["CHA"])
+        pb = calc_pb(level)
+
+        self.name = name
+        self.ac = 13 + dex_mod
+        self.max_hp = max(1, 8 + con_mod + ((level - 1) * (5 + con_mod)))
+        self.hp = self.max_hp
+        self.atk_bonus = pb + wis_mod
+        self.damage_die = 8
+        self.damage_bonus = wis_mod
+        self.alive = True
+        self.turn = True
+
+
+class Fighter:
+    def __init__(self, name: str = "Fighter", level: int = 1, scores: dict = None):
+        if scores is None:
+            scores = {"STR": 15, "DEX": 13, "CON": 14, "INT": 10, "WIS": 12, "CHA": 8}
+
+        str_mod = calc_mod(scores["STR"])
+        dex_mod = calc_mod(scores["DEX"])
+        con_mod = calc_mod(scores["CON"])
+        int_mod = calc_mod(scores["INT"])
+        wis_mod = calc_mod(scores["WIS"])
+        cha_mod = calc_mod(scores["CHA"])
+        pb = calc_pb(level)
+
+        self.name = name
+        self.ac = 18
+        self.max_hp = max(1, 10 + con_mod + ((level - 1) * (6 + con_mod)))
+        self.hp = self.max_hp
+        self.atk_bonus = pb + str_mod
+        self.damage_die = 8
+        self.damage_bonus = str_mod
+        self.alive = True
+        self.turn = True
+
+
+class Monk:
+    def __init__(self, name: str = "Monk", level: int = 1, scores: dict = None):
+        if scores is None:
+            scores = {"STR": 10, "DEX": 15, "CON": 13, "INT": 8, "WIS": 14, "CHA": 12}
+
+        str_mod = calc_mod(scores["STR"])
+        dex_mod = calc_mod(scores["DEX"])
+        con_mod = calc_mod(scores["CON"])
+        int_mod = calc_mod(scores["INT"])
+        wis_mod = calc_mod(scores["WIS"])
+        cha_mod = calc_mod(scores["CHA"])
+        pb = calc_pb(level)
+
+        self.name = name
+        self.ac = 10 + dex_mod + wis_mod
+        self.max_hp = max(1, 8 + con_mod + ((level - 1) * (5 + con_mod)))
+        self.hp = self.max_hp
+        self.atk_bonus = pb + dex_mod
+        self.damage_die = 6
+        self.damage_bonus = dex_mod
+        self.alive = True
+        self.turn = True
+
+
+class Paladin:
+    def __init__(self, name: str = "Paladin", level: int = 1, scores: dict = None):
+        if scores is None:
+            scores = {"STR": 15, "DEX": 10, "CON": 13, "INT": 8, "WIS": 12, "CHA": 14}
+
+        str_mod = calc_mod(scores["STR"])
+        dex_mod = calc_mod(scores["DEX"])
+        con_mod = calc_mod(scores["CON"])
+        int_mod = calc_mod(scores["INT"])
+        wis_mod = calc_mod(scores["WIS"])
+        cha_mod = calc_mod(scores["CHA"])
+        pb = calc_pb(level)
+
+        self.name = name
+        self.ac = 18
+        self.max_hp = max(1, 10 + con_mod + ((level - 1) * (6 + con_mod)))
+        self.hp = self.max_hp
+        self.atk_bonus = pb + str_mod
+        self.damage_die = 8
+        self.damage_bonus = str_mod
+        self.alive = True
+        self.turn = True
+
+
+class Ranger:
+    def __init__(self, name: str = "Ranger", level: int = 1, scores: dict = None):
+        if scores is None:
+            scores = {"STR": 12, "DEX": 15, "CON": 13, "INT": 8, "WIS": 14, "CHA": 10}
+
+        str_mod = calc_mod(scores["STR"])
+        dex_mod = calc_mod(scores["DEX"])
+        con_mod = calc_mod(scores["CON"])
+        int_mod = calc_mod(scores["INT"])
+        wis_mod = calc_mod(scores["WIS"])
+        cha_mod = calc_mod(scores["CHA"])
+        pb = calc_pb(level)
+
+        self.name = name
+        self.ac = 14 + min(2, dex_mod)
+        self.max_hp = max(1, 10 + con_mod + ((level - 1) * (6 + con_mod)))
+        self.hp = self.max_hp
+        self.atk_bonus = pb + dex_mod
+        self.damage_die = 8
+        self.damage_bonus = dex_mod
+        self.alive = True
+        self.turn = True
+
+
+class Rogue:
+    def __init__(self, name: str = "Rogue", level: int = 1, scores: dict = None):
+        if scores is None:
+            scores = {"STR": 8, "DEX": 15, "CON": 12, "INT": 13, "WIS": 10, "CHA": 14}
+
+        str_mod = calc_mod(scores["STR"])
+        dex_mod = calc_mod(scores["DEX"])
+        con_mod = calc_mod(scores["CON"])
+        int_mod = calc_mod(scores["INT"])
+        wis_mod = calc_mod(scores["WIS"])
+        cha_mod = calc_mod(scores["CHA"])
+        pb = calc_pb(level)
+
+        self.name = name
+        self.ac = 11 + dex_mod
+        self.max_hp = max(1, 8 + con_mod + ((level - 1) * (5 + con_mod)))
+        self.hp = self.max_hp
+        self.atk_bonus = pb + dex_mod
+        self.damage_die = 8
+        self.damage_bonus = dex_mod
+        self.alive = True
+        self.turn = True
+
+
+class Sorcerer:
+    def __init__(self, name: str = "Sorcerer", level: int = 1, scores: dict = None):
+        if scores is None:
+            scores = {"STR": 8, "DEX": 13, "CON": 14, "INT": 10, "WIS": 12, "CHA": 15}
+
+        str_mod = calc_mod(scores["STR"])
+        dex_mod = calc_mod(scores["DEX"])
+        con_mod = calc_mod(scores["CON"])
+        int_mod = calc_mod(scores["INT"])
+        wis_mod = calc_mod(scores["WIS"])
+        cha_mod = calc_mod(scores["CHA"])
+        pb = calc_pb(level)
+
+        self.name = name
+        self.ac = 10 + dex_mod
+        self.max_hp = max(1, 6 + con_mod + ((level - 1) * (4 + con_mod)))
+        self.hp = self.max_hp
+        self.atk_bonus = pb + cha_mod
+        self.damage_die = 10
+        self.damage_bonus = cha_mod
+        self.alive = True
+        self.turn = True
+
+
+class Warlock:
+    def __init__(self, name: str = "Warlock", level: int = 1, scores: dict = None):
+        if scores is None:
+            scores = {"STR": 8, "DEX": 13, "CON": 14, "INT": 12, "WIS": 10, "CHA": 15}
+
+        str_mod = calc_mod(scores["STR"])
+        dex_mod = calc_mod(scores["DEX"])
+        con_mod = calc_mod(scores["CON"])
+        int_mod = calc_mod(scores["INT"])
+        wis_mod = calc_mod(scores["WIS"])
+        cha_mod = calc_mod(scores["CHA"])
+        pb = calc_pb(level)
+
+        self.name = name
+        self.ac = 11 + dex_mod
+        self.max_hp = max(1, 8 + con_mod + ((level - 1) * (5 + con_mod)))
+        self.hp = self.max_hp
+        self.atk_bonus = pb + cha_mod
+        self.damage_die = 10
+        self.damage_bonus = cha_mod
+        self.alive = True
+        self.turn = True
+
+
+class Wizard:
+    def __init__(self, name: str = "Wizard", level: int = 1, scores: dict = None):
+        if scores is None:
+            scores = {"STR": 8, "DEX": 14, "CON": 13, "INT": 15, "WIS": 12, "CHA": 10}
+
+        str_mod = calc_mod(scores["STR"])
+        dex_mod = calc_mod(scores["DEX"])
+        con_mod = calc_mod(scores["CON"])
+        int_mod = calc_mod(scores["INT"])
+        wis_mod = calc_mod(scores["WIS"])
+        cha_mod = calc_mod(scores["CHA"])
+        pb = calc_pb(level)
+
+        self.name = name
+        self.ac = 10 + dex_mod
+        self.max_hp = max(1, 6 + con_mod + ((level - 1) * (4 + con_mod)))
+        self.hp = self.max_hp
+        self.atk_bonus = pb + int_mod
+        self.damage_die = 10
+        self.damage_bonus = int_mod
         self.alive = True
         self.turn = True
