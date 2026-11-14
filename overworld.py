@@ -1,31 +1,26 @@
 #The overworld's height, the overworld's width, and the number of tiles the party can see in any direction.
 import sys
+import random
+import time
 from overworldTemplate import overworldTemplate
 from items import Item, Items
 from locations import locations
 from classes import *
-
+from arpeegee import Encounter, Bandit, combat
 OVERWORLD_HEIGHT = 50
 OVERWORLD_WIDTH = 50
 PARTY_VISION_RANGE = 3
 MAP_BOUNDARY = PARTY_VISION_RANGE    #The number of tiles away from the edge of the map the party must be. This is to prevent negative index lookups.
 overworldMap = []
-#This template is read by the setupMap() function in order to determine what the overworld tiles should be. Adjusting the characters in this array directly will change the overworld map when ran.
-#as long as there is an existing rule in setupMap() for that specific tile.
-
 #TODO create an actual starting location other than the top left of the continent.
-player_x_coordinate = 3
-player_y_coordinate = 3
-
+player_x_coordinate = 6
+player_y_coordinate = 6
 #these two variables are used to handle tutorial text that only gets said one time. the same index in both represent the same tutorial.
 #i.e. tutorial_status[0] corresponds to TUTORIAL_TEXT[0]. tutorial_status = True indicates that the tutorial text needs to be printed the next time it is appropriate to do so.
 tutorial_status = [True, True]
 TUTORIAL_TEXT = ["To select what direction to move, type north, east, south, or west, or n, e, s, or w.", "At a town, you may buy, sell, rest, or exit."]
-
-
-
 party = [Fighter(), Wizard(), Rogue(), Cleric()]
-print(party)
+
 class Inventory:
     def __init__(self):
         self.gold = 100
@@ -112,6 +107,9 @@ def handle_input():
         if selection == "quit":
             sys.exit(0)
 
+        elif selection == "fight":
+            initiate_combat()
+
         elif selection == "inventory" or selection == "bag":
             printInventory()
             
@@ -184,6 +182,8 @@ def check_new_position():
     new_position = overworldMap[player_y_coordinate][player_x_coordinate]
     #print(f"The identifier of the tile you stepped on is {new_position.identifier}.") #debug print statement
     if new_position.location_type == "geography":
+        #if random.randint(1,5) == 5:
+            #initiate_combat()
         print(f"You entered a {new_position.identifier}") #if the player has landed on a generic piece of land
     elif new_position.location_type == "town": #if the player lands on a town
         entered_town(new_position)
@@ -286,7 +286,10 @@ def sell():
             del user_inventory[conf_item_index]
         print("Sale Complete.")
                 
-    
+def initiate_combat():
+    print("You are being attacked!")
+    time.sleep(2)
+    combat(Encounter(party,[Bandit(), Bandit(), Bandit(), Bandit()]))
 
 
 
