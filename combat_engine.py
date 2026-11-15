@@ -2,84 +2,125 @@ import random
 from collections import Counter
 import time
 
-BATTLE_SCREEN_WIDTH = 60
-BATTLE_SCREEN_HEIGHT = 10
 horiz_char = "="
 vert_char = "|"
-SELECT_SCREEN_WIDTH = 60
-SELECT_SCREEN_HEIGHT = 5
+
 CRITICAL_ROLL = 20
 
+SELECT_SCREEN_WIDTH = 48
+SELECT_SCREEN_HEIGHT = 6
+SLCT_MIDPOINT = SELECT_SCREEN_WIDTH // 2
 
-def print_battle_screen(encounter):
-    # Initialize blank battle grid
-    battle_grid = [[" " for _ in range(BATTLE_SCREEN_WIDTH)] for _ in range(BATTLE_SCREEN_HEIGHT)]
+# tile types for prototype_battle_grid
+GROUND = "."
 
-    # Draw active party members on the right side
-    party_col = 40
-    for idx, member in enumerate(encounter.party):
-        if member.hp > 0:
-            row = 2 + (idx * 2)  # Rows 2, 4, 6, 8
-            if row < BATTLE_SCREEN_HEIGHT:
-                battle_grid[row][party_col] = member.char
+# information used by print_battle_grid 
+GRID_WIDTH = 24 # must be an even number
+GRID_HEIGHT = 11
 
-    # Draw active enemies on the left side
-    enemy_col = 20
-    for idx, enemy in enumerate(encounter.enemies):
-        if enemy.hp > 0:
-            row = 2 + (idx * 2)  # Rows 2, 4, 6, 8
-            if row < BATTLE_SCREEN_HEIGHT:
-                battle_grid[row][enemy_col] = enemy.char
+MIDPOINT = GRID_WIDTH // 2
 
-    # Render borders and rows to terminal
-    border = " " + horiz_char * (BATTLE_SCREEN_WIDTH + 1)
-    print(border)
+# information used by generate_starting_positions
+ENEMY_COL = (MIDPOINT- 4) - 1 
+PLAYER_COL = (MIDPOINT + 5) - 1
+STARTFROM_ROW = 2
+CHAR_SPACING = 2
+
+# takes party and enemies as arguments, and returns their position on a 24x11 battle grid
+def generate_starting_positions(party, enemies):
+    positions = {}
+
+    for i, character in enumerate(party):
+        row = STARTFROM_ROW + i * CHAR_SPACING
+        positions[character] = (row, PLAYER_COL)
+
+    for i, enemy in enumerate(enemies):
+        row = STARTFROM_ROW + i * CHAR_SPACING
+        positions[enemy] = (row, ENEMY_COL)
+
+    return positions
+
+# takes encounter as an argument and then both creates and prints the battle grid
+def print_battle_grid(encounter):
+    battle_grid = [[GROUND for i in range(GRID_WIDTH)] for i in range(GRID_HEIGHT)]
+
+    for character in encounter.party + encounter.enemies:
+        if character.alive == True:
+            row, col = encounter.positions[character]
+            battle_grid[row][col] = character.char
 
     for row in battle_grid:
-        print("|" + "".join(row) + "|")
-    
-    print(border)
+        print(" "  + " ".join(row))
+
 
 def print_selection_screen(encounter):
-   select_grid = [[" " for i in range(SELECT_SCREEN_WIDTH)] for i in range(SELECT_SCREEN_HEIGHT)]
+    select_grid = [[" " for i in range(SELECT_SCREEN_WIDTH)] for i in range(SELECT_SCREEN_HEIGHT)]
+    
+    # enemy information
+    enemy_name1 = encounter.enemies[0].name
+    enemy_name2 = encounter.enemies[1].name
+    enemy_name3 = encounter.enemies[2].name
+    enemy_name4 = encounter.enemies[3].name
 
-   # enemy information
-   enemy_name = "Bandit"
-   num_enemies = "x4"
+    select_grid[0][1:1 + len(enemy_name1)] = list(enemy_name1)
+    select_grid[1][1:1 + len(enemy_name2)] = list(enemy_name2)
+    select_grid[2][1:1 + len(enemy_name3)] = list(enemy_name3)
+    select_grid[3][1:1 + len(enemy_name4)] = list(enemy_name4)
 
-   select_grid[0][1:1 + len(enemy_name)] = list(enemy_name)
-   select_grid[0][27:27 + len(num_enemies)] = list(num_enemies)
+    e1_hp_str = "hp: " + str(encounter.enemies[0].hp)
+    e2_hp_str = "hp: " + str(encounter.enemies[1].hp)
+    e3_hp_str = "hp: " + str(encounter.enemies[2].hp)
+    e4_hp_str = "hp: " + str(encounter.enemies[3].hp)
 
-   # ally information
-   ally_name1 = "Fighter"
-   ally_name2 = "Wizard"
-   ally_name3 = "Rogue"
-   ally_name4 = "Cleric"
+    enemy_hp_offset = SLCT_MIDPOINT - 9
+    select_grid[0][enemy_hp_offset:enemy_hp_offset + len(e1_hp_str)] = list(e1_hp_str)
+    select_grid[1][enemy_hp_offset:enemy_hp_offset + len(e2_hp_str)] = list(e2_hp_str)
+    select_grid[2][enemy_hp_offset:enemy_hp_offset + len(e3_hp_str)] = list(e3_hp_str)
+    select_grid[3][enemy_hp_offset:enemy_hp_offset + len(e4_hp_str)] = list(e4_hp_str)
 
-   select_grid[0][32:32 + len(ally_name1)] = list(ally_name1)
-   select_grid[1][32:32 + len(ally_name2)] = list(ally_name2)
-   select_grid[2][32:32 + len(ally_name3)] = list(ally_name3)
-   select_grid[3][32:32 + len(ally_name4)] = list(ally_name4)
-   
-   # separator line
-   select_grid[0][30] = "|"
-   select_grid[1][30] = "|"
-   select_grid[2][30] = "|"
-   select_grid[3][30] = "|"
-   select_grid[4][30] = "|"
+    # ally information
+    ally_name1 = encounter.party[0].name
+    ally_name2 = encounter.party[1].name
+    ally_name3 = encounter.party[2].name
+    ally_name4 = encounter.party[3].name
 
-   border = " " + horiz_char * (SELECT_SCREEN_WIDTH + 1)
-   print(border)
+    rightside_offset = SLCT_MIDPOINT + 2
+    select_grid[0][rightside_offset:rightside_offset + len(ally_name1)] = list(ally_name1)
+    select_grid[1][rightside_offset:rightside_offset + len(ally_name2)] = list(ally_name2)
+    select_grid[2][rightside_offset:rightside_offset + len(ally_name3)] = list(ally_name3)
+    select_grid[3][rightside_offset:rightside_offset + len(ally_name4)] = list(ally_name4)
 
-   for row in select_grid:
-       print("|" + "".join(row) + "|")
+    p1_hp_str = "hp: " + str(encounter.party[0].hp)
+    p2_hp_str = "hp: " + str(encounter.party[1].hp)
+    p3_hp_str = "hp: " + str(encounter.party[2].hp)
+    p4_hp_str = "hp: " + str(encounter.party[3].hp)
 
-   print(border)
+    party_hp_offset = SLCT_MIDPOINT + 15
+    select_grid[0][party_hp_offset:party_hp_offset + len(p1_hp_str)] = list(p1_hp_str)
+    select_grid[1][party_hp_offset:party_hp_offset + len(p2_hp_str)] = list(p2_hp_str)
+    select_grid[2][party_hp_offset:party_hp_offset + len(p3_hp_str)] = list(p3_hp_str)
+    select_grid[3][party_hp_offset:party_hp_offset + len(p4_hp_str)] = list(p4_hp_str)
+
+    # separator line
+    select_grid[0][SLCT_MIDPOINT] = "|"
+    select_grid[1][SLCT_MIDPOINT] = "|"
+    select_grid[2][SLCT_MIDPOINT] = "|"
+    select_grid[3][SLCT_MIDPOINT] = "|"
+    select_grid[4][SLCT_MIDPOINT] = "|"
+    select_grid[5][SLCT_MIDPOINT] = "|"
+
+    border = " " + horiz_char * SELECT_SCREEN_WIDTH
+    print(border)
+
+    for row in select_grid:
+        print("|" + "".join(row) + "|")
+
+    print(border)
+
 
 # char_select takes encounter as an argument, and returns a selected character
 # user selects a character they'd like to make an action with using an input string
 def char_select(encounter):
-    
     # take input from user
     while True:
         char_selection = input("Select character to make an action:\n>").strip().casefold()
@@ -101,7 +142,7 @@ def char_select(encounter):
         if conf_char_selection.turn == False:
             print(f"{conf_char_selection.name} can't make an action twice in one round!")
             continue
-            
+
         break
 
     return conf_char_selection
@@ -158,10 +199,54 @@ def enemy_select(encounter):
 
     return conf_enemy_selection
 
+# TODO: make this function decriment a the movement speed of a character by 5 for every move,
+# and disallow characters with an available movement speed of 0 from moving
+# make it so it's not possible to occupy the same space as another character
+# make it so it's not possible to melee attack an enemy unless you're adjacent to them
+# solve map barriers. currently a character can cross the top of the map and appear at the bottom
+# like pacman!
+def move(selected_char, encounter):
+    # characters positions are saved "upside-down" i.e.: (y, x)
+    # for example figter's default position is (2, 16) zero indexed!
+    # meaning the fighter's initial location is 3 down from the top, and 17 to the right 
+    print(selected_char.name + "'s position: " + str(encounter.positions[selected_char]))
+    
+    pos_tuple = list(encounter.positions[selected_char])
+
+    while True:
+        mv_selection = input("Input up, down, left, right to move\n>").strip().lower()
+
+        if mv_selection == "up" or "down" or "left" or "right":
+            if mv_selection == "up":
+                pos_tuple[0] -= 1
+                encounter.positions[selected_char] = pos_tuple
+
+            if mv_selection == "down":
+                pos_tuple[0] += 1
+                encounter.positions[selected_char] = pos_tuple
+
+            if mv_selection == "left":
+                pos_tuple[1] -= 1
+                encounter.positions[selected_char] = pos_tuple
+
+            if mv_selection == "right":
+                pos_tuple[1] += 1
+                encounter.positions[selected_char] = pos_tuple
+            break
+
+        else:
+            print("Invalid input")
+            continue
+
+    print_battle_grid(encounter)
+    print_selection_screen(encounter)
+    return 0
+
 def action_select(selected_char, encounter):
     print(f"" + selected_char.name + "'s available actions:")
     print("Attack")
     print("Defend")
+    print("Move")
     #print("Return") # return option should be made available in the future.
 
     while True:
@@ -176,9 +261,15 @@ def action_select(selected_char, encounter):
             attack(selected_char, target)
             break
 
+        # defend selection case
         if selection == "defend":
             defend(selected_char)
             print(f"{selected_char.name} is defending!")
+            break
+
+        # move selection case
+        if selection == "move":
+            move(selected_char, encounter)
             break
 
         else:
@@ -190,8 +281,11 @@ def defend(character):
     character.turn = False
 
 
-# attack takes two characters as input, one attacker and one defender. first, the function sets the attacker's turn to false, then the function rolls a random number 1-20.
-# if the roll is 20, the attacker critically hits. else if the roll is under 20 but still exceeds defender's ac, the attack hits. else the roll is less than the defender's ac, and the attacker misses
+# attack takes two characters as input, one attacker and one defender. first, the function sets 
+# the attacker's turn to false, then the function rolls a random number 1-20.
+# if the roll is 20, the attacker critically hits. else if the roll is under 20 
+# but still exceeds defender's ac, the attack hits. else the roll is less than the defender's ac
+# and the attacker misses
 def attack(attacker, defender):
     attacker.turn = False
     atk_roll = random.randint(1, 20)
@@ -209,10 +303,8 @@ def attack(attacker, defender):
         damage_roll1 = random.randint(1, attacker.damage_die)
         damage_roll2 = random.randint(1, attacker.damage_die)
         final_damage = damage_roll1 + damage_roll2 + attacker.damage_bonus
-        
+
         defender.hp -= final_damage
-        # enemy health print statement is for debug, it is intended to be removed
-        print(f"{defender.name} curr hp = {defender.hp}")
         print(f"{attacker.name} rolled a {atk_roll}! Critical hit! Damage: {damage_roll1} + {damage_roll2} + {attacker.damage_bonus} = {final_damage}")
         if defender.hp <= 0:
             defender.alive = False
@@ -223,8 +315,6 @@ def attack(attacker, defender):
         final_damage = damage + attacker.damage_bonus
         defender.hp -= final_damage
         print(f"{attacker.name} rolled a {atk_roll} + {attacker.atk_bonus}! Hit! Damage: {damage} + {attacker.damage_bonus} = {final_damage}")
-        # enemy health print statement is for debug purposes only, and is intended to be removed in later iterations
-        print(f"{defender.name} curr hp = {defender.hp}")
         if defender.hp <= 0:
             defender.alive = False
             print(f"{defender.name} is dead!")
@@ -279,22 +369,21 @@ def enumerate_enemies(enemies):
             enemy.name = enemy_type
         else:
             enemy.name = f"{enemy_type} {seen[enemy_type]}"
-    # delete when not needed for debug
-    #   for enemy in enemies:
-        #print(enemy.name)
 
 class Encounter:
-    def __init__(self, party, enemies):
+    def __init__(self, party, enemies, positions):
         self.party = party
         self.enemies = enemies
+        self.positions = positions
         self.win = False
         self.complete = False
-        
+
 def test_encounter():
-    return Encounter (
-            party = [Fighter(), Wizard(), Rogue(), Cleric()],
-            enemies = [Bandit(), Bandit(), Bandit(), Bandit()]
-        )
+    party = [Fighter(), Wizard(), Rogue(), Cleric()]
+    enemies = [Bandit(), Bandit(), Bandit(), Bandit()]
+    positions = generate_starting_positions(party, enemies)
+
+    return Encounter(party, enemies, positions)
 
 class Bandit:
     def __init__(self):
@@ -397,6 +486,7 @@ def equip_weapon(character, weapon):
 def combat(encounter):
         # load encounter and enumerate duplicate enemies
     enumerate_enemies(encounter.enemies)
+    encounter.positions = generate_starting_positions(encounter.party, encounter.enemies)
     
     # core game loop
     while True:
@@ -406,8 +496,7 @@ def combat(encounter):
             break
 
         # print the screens
-        # NOTE todo: finish making screens so they reflect gamestate data
-        print_battle_screen(encounter)
+        print_battle_grid(encounter)
         print_selection_screen(encounter)
 
         # attack and defend loop. at any point in the loop if all enemies are dead,
@@ -432,10 +521,10 @@ def combat(encounter):
         # enemy round
         enemy_round(encounter)
 
-        # reset party member turns for next player round
-        all(characters.turn == True for characters in encounter.party)
-        # reset party member defend flag
-        all(characters.defend == False for characters in encounter.party)
+        for character in encounter.party:
+            character.turn = True
+            character.defend = False
+
     if encounter.win == True:
         print("You win!")
     else:
@@ -454,8 +543,7 @@ def main():
             break
 
         # print the screens
-        # NOTE todo: finish making screens so they reflect gamestate data
-        print_battle_screen(encounter)
+        print_battle_grid(encounter)
         print_selection_screen(encounter)
 
         # attack and defend loop. at any point in the loop if all enemies are dead,
@@ -465,6 +553,7 @@ def main():
                 encounter.win = True
                 encounter.complete = True
                 break
+
             # select a character, and then an action for the selected character
             selected_char = char_select(encounter)
             action_select(selected_char, encounter)
@@ -472,18 +561,21 @@ def main():
             # if all party members have taken their turn, proceed to enemy round
             if all(characters.turn == False or characters.alive == False for characters in encounter.party):
                 break
+
         # win condition check
         if all(enemies.alive == False for enemies in encounter.enemies):
             encounter.win = True
             encounter.complete = True
             break
+
         # enemy round
         enemy_round(encounter)
 
-        # reset party member turns for next player round
-        all(characters.turn == True for characters in encounter.party)
-        # reset party member defend flag
-        all(characters.defend == False for characters in encounter.party)
+        # reset party member turns for next player round and defend flag
+        for character in encounter.party:
+            character.turn = True
+            character.defend = False
+
     if encounter.win == True:
         print("You win!")
     else:

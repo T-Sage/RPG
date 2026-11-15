@@ -6,7 +6,7 @@ from overworldTemplate import overworldTemplate
 from items import Item, Items
 from locations import locations
 from classes import *
-from arpeegee import Encounter, Bandit, combat
+from combat_engine import Encounter, Bandit, combat
 OVERWORLD_HEIGHT = 50
 OVERWORLD_WIDTH = 50
 PARTY_VISION_RANGE = 3
@@ -289,7 +289,7 @@ def sell():
 def initiate_combat():
     print("You are being attacked!")
     time.sleep(2)
-    combat(Encounter(party,[Bandit(), Bandit(), Bandit(), Bandit()]))
+    combat(Encounter(party,[Bandit(), Bandit(), Bandit(), Bandit()], positions = {}))
 
 
 
