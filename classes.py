@@ -1,3 +1,5 @@
+#This is an obsolete file being read by overworld.py until character_creation is ready.
+
 class Fighter:
     def __init__(self):
         self.name = "Fighter"

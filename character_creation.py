@@ -53,7 +53,7 @@ class Bard:
         self.max_hp = max(1, 8 + con_mod + ((level - 1) * (5 + con_mod)))
         self.hp = self.max_hp
         self.atk_bonus = pb + cha_mod
-        self.damage_die = 8
+        self.damage_die = 6
         self.damage_bonus = dex_mod
         self.alive = True
         self.turn = True
@@ -101,7 +101,7 @@ class Druid:
         self.max_hp = max(1, 8 + con_mod + ((level - 1) * (5 + con_mod)))
         self.hp = self.max_hp
         self.atk_bonus = pb + wis_mod
-        self.damage_die = 8
+        self.damage_die = 6
         self.damage_bonus = wis_mod
         self.alive = True
         self.turn = True
@@ -125,7 +125,7 @@ class Fighter:
         self.max_hp = max(1, 10 + con_mod + ((level - 1) * (6 + con_mod)))
         self.hp = self.max_hp
         self.atk_bonus = pb + str_mod
-        self.damage_die = 8
+        self.damage_die = 10
         self.damage_bonus = str_mod
         self.alive = True
         self.turn = True
@@ -149,7 +149,7 @@ class Monk:
         self.max_hp = max(1, 8 + con_mod + ((level - 1) * (5 + con_mod)))
         self.hp = self.max_hp
         self.atk_bonus = pb + dex_mod
-        self.damage_die = 6
+        self.damage_die = 8
         self.damage_bonus = dex_mod
         self.alive = True
         self.turn = True
@@ -173,7 +173,7 @@ class Paladin:
         self.max_hp = max(1, 10 + con_mod + ((level - 1) * (6 + con_mod)))
         self.hp = self.max_hp
         self.atk_bonus = pb + str_mod
-        self.damage_die = 8
+        self.damage_die = 10
         self.damage_bonus = str_mod
         self.alive = True
         self.turn = True
@@ -245,7 +245,7 @@ class Sorcerer:
         self.max_hp = max(1, 6 + con_mod + ((level - 1) * (4 + con_mod)))
         self.hp = self.max_hp
         self.atk_bonus = pb + cha_mod
-        self.damage_die = 10
+        self.damage_die = 6
         self.damage_bonus = cha_mod
         self.alive = True
         self.turn = True
@@ -269,7 +269,7 @@ class Warlock:
         self.max_hp = max(1, 8 + con_mod + ((level - 1) * (5 + con_mod)))
         self.hp = self.max_hp
         self.atk_bonus = pb + cha_mod
-        self.damage_die = 10
+        self.damage_die = 6
         self.damage_bonus = cha_mod
         self.alive = True
         self.turn = True
@@ -293,7 +293,7 @@ class Wizard:
         self.max_hp = max(1, 6 + con_mod + ((level - 1) * (4 + con_mod)))
         self.hp = self.max_hp
         self.atk_bonus = pb + int_mod
-        self.damage_die = 10
+        self.damage_die = 6
         self.damage_bonus = int_mod
         self.alive = True
         self.turn = True
