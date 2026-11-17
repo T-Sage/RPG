@@ -289,7 +289,7 @@ def sell():
 def initiate_combat():
     print("You are being attacked!")
     time.sleep(2)
-    combat(Encounter(party,[Bandit(), Bandit(), Bandit(), Bandit()], positions = {}))
+    combat(Encounter(party,[Bandit(), Bandit(), Bandit(), Bandit()], positions = {}, battle_grid = {}))
 
 
 

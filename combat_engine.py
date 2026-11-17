@@ -13,10 +13,11 @@ SLCT_MIDPOINT = SELECT_SCREEN_WIDTH // 2
 
 # tile types for prototype_battle_grid
 GROUND = "."
+BARRIER = "#"
 
 # information used by print_battle_grid 
 GRID_WIDTH = 24 # must be an even number
-GRID_HEIGHT = 11
+GRID_HEIGHT = 16
 
 MIDPOINT = GRID_WIDTH // 2
 
@@ -25,6 +26,25 @@ ENEMY_COL = (MIDPOINT- 4) - 1
 PLAYER_COL = (MIDPOINT + 5) - 1
 STARTFROM_ROW = 2
 CHAR_SPACING = 2
+
+
+
+class Tile:
+    def __init__(self, char, nostep):
+        self.char = char
+        self.nostep = nostep
+
+
+class Ground(Tile):
+    def __init__(self):
+        self.char = "."
+        self.nostep = False
+
+class Barrier(Tile):
+    def __init__(self):
+        self.char = "#"
+        self.nostep = True
+
 
 # takes party and enemies as arguments, and returns their position on a 24x11 battle grid
 def generate_starting_positions(party, enemies):
@@ -41,17 +61,25 @@ def generate_starting_positions(party, enemies):
     return positions
 
 # takes encounter as an argument and then both creates and prints the battle grid
-def print_battle_grid(encounter):
-    battle_grid = [[GROUND for i in range(GRID_WIDTH)] for i in range(GRID_HEIGHT)]
+def generate_battle_grid(encounter):
+    battle_grid = [
+            [
+                Barrier() if (row == 0 or row == GRID_HEIGHT - 1 or col == 0 or col == GRID_WIDTH - 1)
+                else Ground() for col in range(GRID_WIDTH)
+            ] 
+            for row in range(GRID_HEIGHT)
+        ]
+    return battle_grid
 
+def update_combatants(encounter):
     for character in encounter.party + encounter.enemies:
         if character.alive == True:
             row, col = encounter.positions[character]
-            battle_grid[row][col] = character.char
+            encounter.battle_grid[row][col] = character
 
-    for row in battle_grid:
-        print(" "  + " ".join(row))
-
+def print_battle_grid(encounter):
+    for row in encounter.battle_grid:
+        print(" "  + " ".join(tile.char for tile in row))
 
 def print_selection_screen(encounter):
     select_grid = [[" " for i in range(SELECT_SCREEN_WIDTH)] for i in range(SELECT_SCREEN_HEIGHT)]
@@ -197,7 +225,8 @@ def enemy_select(encounter):
 
         break
 
-    return conf_enemy_selection
+    return conf_enemy_selectiona
+
 
 # TODO: make this function decriment a the movement speed of a character by 5 for every move,
 # and disallow characters with an available movement speed of 0 from moving
@@ -218,8 +247,16 @@ def move(selected_char, encounter):
 
         if mv_selection == "up" or "down" or "left" or "right":
             if mv_selection == "up":
-                pos_tuple[0] -= 1
-                encounter.positions[selected_char] = pos_tuple
+                if encounter.battle_grid[pos_tuple[0] - 1][pos_tuple[1]].nostep == False:
+                    pos_tuple[0] -= 1
+                    encounter.positions[selected_char] = pos_tuple
+
+                    update_combatants(encounter)
+                else:
+                    print("no")
+                    continue
+
+                    #battle_grid
 
             if mv_selection == "down":
                 pos_tuple[0] += 1
@@ -371,10 +408,11 @@ def enumerate_enemies(enemies):
             enemy.name = f"{enemy_type} {seen[enemy_type]}"
 
 class Encounter:
-    def __init__(self, party, enemies, positions):
+    def __init__(self, party, enemies, positions, battle_grid):
         self.party = party
         self.enemies = enemies
         self.positions = positions
+        self.battle_grid = battle_grid
         self.win = False
         self.complete = False
 
@@ -487,6 +525,8 @@ def combat(encounter):
         # load encounter and enumerate duplicate enemies
     enumerate_enemies(encounter.enemies)
     encounter.positions = generate_starting_positions(encounter.party, encounter.enemies)
+    encounter.battle_grid = generate_battle_grid(encounter)
+    update_combatants(encounter)
     
     # core game loop
     while True:
@@ -496,6 +536,7 @@ def combat(encounter):
             break
 
         # print the screens
+        print(encounter.battle_grid[0][0].nostep)
         print_battle_grid(encounter)
         print_selection_screen(encounter)
 
@@ -543,6 +584,7 @@ def main():
             break
 
         # print the screens
+        print(encounter.battle_grid[0][0].nostep)
         print_battle_grid(encounter)
         print_selection_screen(encounter)
 
