@@ -1,4 +1,7 @@
 import math
+from random import random
+
+from sqlalchemy import null
 
 # --- HELPER DERIVATION FUNCTIONS ---
 
@@ -465,3 +468,35 @@ class Beholder_Zombie:
         self.damage_bonus = str_mod
         self.alive = True
         self.turn = True
+
+#enemy_types [1] = Plains Biome
+#enemy_types [2] = Forest Biome
+#enemy_types [3] = Desert Biome
+#enemy_types [4] = Mountain Biome
+
+#enemy_types [1][0] = Plains Biome, difficulty 1
+#enemy_types [1][1] = Plains Biome, difficulty 2
+#enemy_types [1][2] = Plains Biome, difficulty 3
+
+enemy_types =  [[[null]],
+                [[null],[Bandit, Goblin_Minion, Zombie], [Bandit, Bandit_Crime_Lord, Goblin_Minion, Goblin_Warrior, Zombie, Beholder_Zombie], [Bandit_Captain, Bandit_Deceiver, Goblin_Warrior, Winged_Kobold, Beholder_Zombie], [Bandit_Captain, Bandit_Deceiver, Goblin_Warrior, Winged_Kobold, Beholder_Zombie]], 
+                [[null],[Bandit, Zombie, Ogre_Zombie, Flaming_Skeleton]],
+                [[null],[Bandit, Goblin_Warrior, Winged_Kobold, Beholder_Zombie]], 
+                [[null],[Skeleton, Bandit_Captain, Bandit_Deceiver, Bandit_Crime_Lord]]]
+
+difficulty_multiplier = [.85, 1.0, 1.1, 1.5]
+
+def enemy_creation(zone: int, difficulty: int, level: int) -> list:
+    enemies = []
+    temp = enemy_types[zone][difficulty]
+    total_enemies = math.randomint(0, 3) + 1
+    for i in range(total_enemies):
+        enemy_class = random.choice(temp)
+        enemies.append(enemy_class(level=level))
+
+    for enemy in enemies:
+        enemy.hp = math.ceil(enemy.hp * difficulty_multiplier[difficulty])
+        enemy.max_hp = enemy.hp
+        enemy.atk_bonus = math.ceil(enemy.atk_bonus * difficulty_multiplier[difficulty])
+        enemy.damage_bonus = math.ceil(enemy.damage_bonus * difficulty_multiplier[difficulty]) 
+    return enemies
