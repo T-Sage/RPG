@@ -1,5 +1,5 @@
 import math
-from random import random
+import random
 
 from sqlalchemy import null
 
@@ -36,6 +36,8 @@ class Bandit:
         self.damage_bonus = dex_mod
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = 'B'
 
 
 class Bandit_Captain:
@@ -60,7 +62,8 @@ class Bandit_Captain:
         self.damage_bonus = dex_mod
         self.alive = True
         self.turn = True
-
+        self.defend = False
+        self.char = 'C'
 
 class Bandit_Deceiver:
     def __init__(self, name: str = "Bandit Deceiver", level: int = 7, scores: dict = None):
@@ -84,6 +87,10 @@ class Bandit_Deceiver:
         self.damage_bonus = dex_mod
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = 'D'
+
+        
 
 
 class Bandit_Crime_Lord:
@@ -107,6 +114,7 @@ class Bandit_Crime_Lord:
         self.damage_die = 6
         self.damage_bonus = dex_mod
         self.alive = True
+        self.defend = False
         self.turn = True
 
 
@@ -132,6 +140,8 @@ class Ghoul:
         self.damage_bonus = dex_mod
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = 'G'
 
 
 class Lacedon_Ghoul:
@@ -156,6 +166,8 @@ class Lacedon_Ghoul:
         self.damage_bonus = dex_mod
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = 'G'
 
 
 class Goblin_Minion:
@@ -180,6 +192,8 @@ class Goblin_Minion:
         self.damage_bonus = dex_mod
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = 'M'
 
 
 class Goblin_Warrior:
@@ -204,7 +218,8 @@ class Goblin_Warrior:
         self.damage_bonus = dex_mod
         self.alive = True
         self.turn = True
-
+        self.defend = False
+        self.char = 'W'
 
 class Goblin_Boss:
     def __init__(self, name: str = "Goblin Boss", level: int = 1, scores: dict = None):
@@ -228,7 +243,8 @@ class Goblin_Boss:
         self.damage_bonus = dex_mod
         self.alive = True
         self.turn = True
-
+        self.defend = False
+        self.char = 'Q'
 
 class Goblin_Hexer:
     def __init__(self, name: str = "Goblin Hexer", level: int = 3, scores: dict = None):
@@ -252,6 +268,8 @@ class Goblin_Hexer:
         self.damage_bonus = int_mod
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = 'H'
 
 
 class Kobold_Warrior:
@@ -276,6 +294,8 @@ class Kobold_Warrior:
         self.damage_bonus = dex_mod
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = 'K'
 
 
 class Winged_Kobold:
@@ -300,6 +320,8 @@ class Winged_Kobold:
         self.damage_bonus = dex_mod
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = 'P'
 
 
 class Skeleton:
@@ -324,7 +346,8 @@ class Skeleton:
         self.damage_bonus = dex_mod
         self.alive = True
         self.turn = True
-
+        self.defend = False
+        self.char = 'S'
 
 class Warhorse_Skeleton:
     def __init__(self, name: str = "Warhorse Skeleton", level: int = 1, scores: dict = None):
@@ -348,6 +371,8 @@ class Warhorse_Skeleton:
         self.damage_bonus = str_mod
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = 'T'
 
 
 class Minotaur_Skeleton:
@@ -372,7 +397,8 @@ class Minotaur_Skeleton:
         self.damage_bonus = str_mod
         self.alive = True
         self.turn = True
-
+        self.defend = False
+        self.char = 'M'
 
 class Flaming_Skeleton:
     def __init__(self, name: str = "Flaming Skeleton", level: int = 3, scores: dict = None):
@@ -396,7 +422,8 @@ class Flaming_Skeleton:
         self.damage_bonus = wis_mod
         self.alive = True
         self.turn = True
-
+        self.defend = False
+        self.char = 'F'
 
 class Zombie:
     def __init__(self, name: str = "Zombie", level: int = 1, scores: dict = None):
@@ -420,6 +447,8 @@ class Zombie:
         self.damage_bonus = str_mod
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = 'Z'
 
 
 class Ogre_Zombie:
@@ -444,6 +473,9 @@ class Ogre_Zombie:
         self.damage_bonus = str_mod
         self.alive = True
         self.turn = True
+        self.defend = False
+
+        self.char = 'O'
 
 
 class Beholder_Zombie:
@@ -468,6 +500,8 @@ class Beholder_Zombie:
         self.damage_bonus = str_mod
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = 'B'
 
 #enemy_types [1] = Plains Biome
 #enemy_types [2] = Forest Biome
@@ -489,7 +523,8 @@ difficulty_multiplier = [.85, 1.0, 1.1, 1.5]
 def enemy_creation(zone: int, difficulty: int, level: int) -> list:
     enemies = []
     temp = enemy_types[zone][difficulty]
-    total_enemies = math.randomint(0, 3) + 1
+    #total_enemies = random.randint(1, 4)
+    total_enemies = 4
     for i in range(total_enemies):
         enemy_class = random.choice(temp)
         enemies.append(enemy_class(level=level))

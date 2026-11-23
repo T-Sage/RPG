@@ -33,6 +33,7 @@ class Barbarian:
         self.damage_bonus = str_mod
         self.alive = True
         self.turn = True
+        self.char = 'B'
 
 
 class Bard:
@@ -57,6 +58,7 @@ class Bard:
         self.damage_bonus = dex_mod
         self.alive = True
         self.turn = True
+        self.char = 'D'
 
 
 class Cleric:
@@ -81,6 +83,7 @@ class Cleric:
         self.damage_bonus = wis_mod
         self.alive = True
         self.turn = True
+        self.char = 'C'
 
 
 class Druid:
@@ -105,6 +108,7 @@ class Druid:
         self.damage_bonus = wis_mod
         self.alive = True
         self.turn = True
+        self.char = 'D'
 
 
 class Fighter:
@@ -129,7 +133,7 @@ class Fighter:
         self.damage_bonus = str_mod
         self.alive = True
         self.turn = True
-
+        self.char = 'F'
 
 class Monk:
     def __init__(self, name: str = "Monk", level: int = 1, scores: dict = None):
@@ -153,7 +157,7 @@ class Monk:
         self.damage_bonus = dex_mod
         self.alive = True
         self.turn = True
-
+        self.char = 'M'
 
 class Paladin:
     def __init__(self, name: str = "Paladin", level: int = 1, scores: dict = None):
@@ -177,6 +181,7 @@ class Paladin:
         self.damage_bonus = str_mod
         self.alive = True
         self.turn = True
+        self.char = 'P'
 
 
 class Ranger:
@@ -201,6 +206,7 @@ class Ranger:
         self.damage_bonus = dex_mod
         self.alive = True
         self.turn = True
+        self.char = 'R'
 
 
 class Rogue:
@@ -225,6 +231,7 @@ class Rogue:
         self.damage_bonus = dex_mod
         self.alive = True
         self.turn = True
+        self.char = 'E'
 
 
 class Sorcerer:
@@ -249,6 +256,7 @@ class Sorcerer:
         self.damage_bonus = cha_mod
         self.alive = True
         self.turn = True
+        self.char = 'S'
 
 
 class Warlock:
@@ -273,6 +281,7 @@ class Warlock:
         self.damage_bonus = cha_mod
         self.alive = True
         self.turn = True
+        self.char = 'L'
 
 
 class Wizard:
@@ -297,3 +306,4 @@ class Wizard:
         self.damage_bonus = int_mod
         self.alive = True
         self.turn = True
+        self.char = 'W'

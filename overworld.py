@@ -2,6 +2,7 @@
 import sys
 import random
 import time
+import monster_creation
 from overworldTemplate import overworldTemplate
 from items import Item, Items
 from locations import locations
@@ -289,7 +290,7 @@ def sell():
 def initiate_combat():
     print("You are being attacked!")
     time.sleep(2)
-    combat(Encounter(party,[Bandit(), Bandit(), Bandit(), Bandit()], positions = {}))
+    combat(Encounter(party,monster_creation.enemy_creation(1,1,1), positions = {}))
 
 
 
