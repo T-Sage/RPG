@@ -1,5 +1,6 @@
 import random
 from collections import Counter
+from character_creation import Fighter, Rogue, Wizard, Cleric, Barbarian, Druid, Monk, Paladin, Sorcerer, Warlock, Bard, Ranger
 import time
 
 horiz_char = "="
@@ -300,8 +301,8 @@ def attack(attacker, defender):
             atk_roll = atk_roll2
 
     if atk_roll == CRITICAL_ROLL:
-        damage_roll1 = random.randint(1, attacker.damage_die)
-        damage_roll2 = random.randint(1, attacker.damage_die)
+        damage_roll1 = random.randint(1, attacker.weapon.damage_die)
+        damage_roll2 = random.randint(1, attacker.weapon.damage_die)
         final_damage = damage_roll1 + damage_roll2 + attacker.damage_bonus
 
         defender.hp -= final_damage
@@ -310,11 +311,11 @@ def attack(attacker, defender):
             defender.alive = False
             print(f"{defender.name} is dead!")
     
-    elif atk_roll + attacker.atk_bonus >= defender.ac:
-        damage = random.randint(1, attacker.damage_die)
+    elif atk_roll + attacker.get_total_attack_bonus >= defender.ac:
+        damage = random.randint(1, attacker.weapon.damage_die)
         final_damage = damage + attacker.damage_bonus
         defender.hp -= final_damage
-        print(f"{attacker.name} rolled a {atk_roll} + {attacker.atk_bonus}! Hit! Damage: {damage} + {attacker.damage_bonus} = {final_damage}")
+        print(f"{attacker.name} rolled a {atk_roll} + {attacker.get_total_attack_bonus}! Hit! Damage: {damage} + {attacker.damage_bonus} = {final_damage}")
         if defender.hp <= 0:
             defender.alive = False
             print(f"{defender.name} is dead!")
@@ -399,81 +400,26 @@ class Bandit:
         self.char = "B"
         self.defend = False
 
-class Fighter:
-    def __init__(self):
-        self.name = "Fighter"
-        self.ac = 16
-        self.max_hp = 13
-        self.hp = self.max_hp
-        self.atk_bonus = 5
-        self.damage_die = 8
-        self.damage_bonus = 5
-        self.alive = True
-        self.turn = True
-        self.char = "F"
-        self.defend = False
 
-class Rogue:
-    def __init__(self):
-        self.name = "Rogue"
-        self.ac = 14
-        self.max_hp = 10
-        self.hp = self.max_hp
-        self.atk_bonus = 5
-        self.damage_die = 6
-        self.damage_bonus = 5
-        self.alive = True
-        self.turn = True
-        self.char = "R"
-        self.defend = False
+# class Weapon:
+#     def __init__(self, name, bonus_atk, bonus_dmg_die, bonus_dmg):
+#         self.name = name
+#         self.bonus_atk = bonus_atk
+#         self.bonus_dmg_die = bonus_dmg_die
+#         self.bonus_dmg = bonus_dmg
 
-class Wizard:
-    def __init__(self):
-        self.name = "Wizard"
-        self.ac = 12
-        self.max_hp = 8
-        self.hp = self.max_hp
-        self.atk_bonus = 2
-        self.damage_die = 6
-        self.damage_bonus = 0
-        self.alive = True
-        self.turn = True
-        self.char = "W"
-        self.defend = False
+# #Example weapon subclasses
+# class IronSword(Weapon):
+#     def __init__(self):
+#         super().__init__("Iron Sword", 0, 10, 5)
 
-class Cleric:
-    def __init__(self):
-        self.name = "Cleric"
-        self.ac = 16
-        self.max_hp = 10
-        self.hp = self.max_hp
-        self.atk_bonus = 4
-        self.damage_die = 6
-        self.damage_bonus = 2
-        self.alive = True
-        self.turn = True
-        self.char = "C"
-        self.defend = False
+# class WoodenStaff(Weapon):
+#     def __init__(self):
+#         super().__init__("Wooden Staff", 0, 10, 2)
 
-class Weapon:
-    def __init__(self, name, bonus_atk, bonus_dmg_die, bonus_dmg):
-        self.name = name
-        self.bonus_atk = bonus_atk
-        self.bonus_dmg_die = bonus_dmg_die
-        self.bonus_dmg = bonus_dmg
-
-#Example weapon subclasses
-class IronSword(Weapon):
-    def __init__(self):
-        super().__init__("Iron Sword", 0, 10, 5)
-
-class WoodenStaff(Weapon):
-    def __init__(self):
-        super().__init__("Wooden Staff", 0, 10, 2)
-
-class Dagger(Weapon):
-    def __init__(self):
-        super().__init__("Dagger", 0, 10, 4)
+# class Dagger(Weapon):
+#     def __init__(self):
+#         super().__init__("Dagger", 0, 10, 4)
         
 # Function to equip a weapon to any of your teammate's character objects
 def equip_weapon(character, weapon):

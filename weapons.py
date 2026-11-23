@@ -17,13 +17,14 @@ class Weapon_Type:
 
 #This Enum class contains constants for every type of weapon in the game. Many weapons will share a weapon type. All swords will have the sword type for instance.
 #Damage type is also determined by weapon type. All swords deal slashing damage, all hammer do bludgeoning damage.
-#TODO determine which classes can equip which weapon types. Fighter can use swords, but can they use hammers? Classes don't only equip 1 type of weapon.
-#TODO add more types? Axes? Spears? Bows? Etc. Whatever is appropriate for the other classes adedd in character_creation
+#todo determine which classes can equip which weapon types. Fighter can use swords, but can they use hammers? Classes don't only equip 1 type of weapon.
 class Weapon_Types(Enum):
     SWORD = Weapon_Type("sword", "slashing")
     HAMMER = Weapon_Type("hammer", "bludgeoning")
     STAFF = Weapon_Type("staff", "bludgeoning")
     FINESSE = Weapon_Type("finesse", "piercing")
+    AXE = Weapon_Type("axe", "slashing")
+    BOW = Weapon_Type("bow", "piercing")
 
 #Define each individual instance of a weapon as a constant in the Weapons Enum class. This class holds all data for all specific weapons in our game.
 #Other parts of the game only need to import Weapons from weapons.py and then do Weapons.IRON_SWORD.value to return the weapon object associated with, in this example, the iron sword.
@@ -34,6 +35,13 @@ class Weapons(Enum):
     IRON_MACE = Weapon(name="Iron Mace", type=Weapon_Types.HAMMER.value.type, attack_bonus=0, damage_die=8, damage_bonus=0, damage_type=Weapon_Types.HAMMER.damage_type) #Starting Hammer (Cleric)
     STAFF = Weapon(name="Staff", type=Weapon_Types.STAFF.value.type, attack_bonus=0, damage_die=6, damage_bonus=0, damage_type=Weapon_Types.STAFF.damage_type) #Starting Staff (Wizard)
     RAPIER = Weapon(name="Rapier", type=Weapon_Types.FINESSE.value.type, attack_bonus=0, damage_die=8, damage_bonus=0, damage_type=Weapon_Types.FINESSE.damage_type) #Starting Finesse Weapon (Rogue)
-    
-    #TODO Add starting weapons for the other classes in character_creation.py. If a class would use a weapon that is already made, you don't have to make a new one for that class. Just add their class to the comment
-    #TODO Add weapons that are upgrades for each weapon type. Example: (Steel sword is slightly better than iron sword, same damage die but maybe +1 to attack and damage bonus?)
+    GREATAXE = Weapon(name="Greataxe", type=Weapon_Types.AXE.value.type, attack_bonus=0, damage_die=12, damage_bonus=0, damage_type=Weapon_Types.AXE.damage_type) # Barbarian
+    SHORTBOW = Weapon(name="Shortbow", type=Weapon_Types.BOW.value.type, attack_bonus=0, damage_die=6, damage_bonus=0, damage_type=Weapon_Types.BOW.damage_type) # Ranger
+
+    # --- Upgraded Weapons ---
+    STEEL_SWORD = Weapon(name="Steel Sword", type=Weapon_Types.SWORD.value.type, attack_bonus=1, damage_die=10, damage_bonus=1, damage_type=Weapon_Types.SWORD.damage_type)
+    STEEL_MACE = Weapon(name="Steel Mace", type=Weapon_Types.HAMMER.value.type, attack_bonus=1, damage_die=8, damage_bonus=1, damage_type=Weapon_Types.HAMMER.damage_type)
+    GREATER_STAFF = Weapon(name="Greater Staff", type=Weapon_Types.STAFF.value.type, attack_bonus=1, damage_die=6, damage_bonus=1, damage_type=Weapon_Types.STAFF.damage_type)
+    MASTERWORK_RAPIER = Weapon(name="Masterwork Rapier", type=Weapon_Types.FINESSE.value.type, attack_bonus=1, damage_die=8, damage_bonus=1, damage_type=Weapon_Types.FINESSE.damage_type)
+    BATTLEAXE = Weapon(name="Battleaxe", type=Weapon_Types.AXE.value.type, attack_bonus=1, damage_die=12, damage_bonus=1, damage_type=Weapon_Types.AXE.damage_type)
+    COMPOSITE_BOW = Weapon(name="Composite Bow", type=Weapon_Types.BOW.value.type, attack_bonus=1, damage_die=6, damage_bonus=1, damage_type=Weapon_Types.BOW.damage_type)

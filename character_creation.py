@@ -1,4 +1,5 @@
 import math
+from weapons import Weapons
 
 # --- HELPER DERIVATION FUNCTIONS ---
 
@@ -31,8 +32,14 @@ class Barbarian:
         self.atk_bonus = pb + str_mod
         self.damage_die = 12
         self.damage_bonus = str_mod
+        self.weapon = Weapons.GREATAXE.value
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = "BB"
+    
+    def get_total_attack_bonus(self) -> int:
+        return self.character_attack_bonus + self.weapon.attack_bonus
 
 
 class Bard:
@@ -55,8 +62,16 @@ class Bard:
         self.atk_bonus = pb + cha_mod
         self.damage_die = 6
         self.damage_bonus = dex_mod
+        self.weapon = Weapons.RAPIER.value
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = "BA"
+        
+    def get_total_attack_bonus(self) -> int:
+        return self.character_attack_bonus + self.weapon.attack_bonus
+        
+
 
 
 class Cleric:
@@ -79,8 +94,14 @@ class Cleric:
         self.atk_bonus = pb + wis_mod
         self.damage_die = 8
         self.damage_bonus = wis_mod
+        self.weapon = Weapons.IRON_MACE.value
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = "CL"
+        
+    def get_total_attack_bonus(self) -> int:
+        return self.character_attack_bonus + self.weapon.attack_bonus
 
 
 class Druid:
@@ -103,8 +124,14 @@ class Druid:
         self.atk_bonus = pb + wis_mod
         self.damage_die = 6
         self.damage_bonus = wis_mod
+        self.weapon = Weapons.STAFF.value
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = "DR"
+        
+    def get_total_attack_bonus(self) -> int:
+        return self.character_attack_bonus + self.weapon.attack_bonus
 
 
 class Fighter:
@@ -127,8 +154,14 @@ class Fighter:
         self.atk_bonus = pb + str_mod
         self.damage_die = 10
         self.damage_bonus = str_mod
+        self.weapon = Weapons.IRON_SWORD.value
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = "FI"
+        
+    def get_total_attack_bonus(self) -> int:
+        return self.character_attack_bonus + self.weapon.attack_bonus
 
 
 class Monk:
@@ -151,8 +184,14 @@ class Monk:
         self.atk_bonus = pb + dex_mod
         self.damage_die = 8
         self.damage_bonus = dex_mod
+        self.weapon = Weapons.STAFF.value
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = "MO"
+        
+    def get_total_attack_bonus(self) -> int:
+        return self.character_attack_bonus + self.weapon.attack_bonus
 
 
 class Paladin:
@@ -175,8 +214,14 @@ class Paladin:
         self.atk_bonus = pb + str_mod
         self.damage_die = 10
         self.damage_bonus = str_mod
+        self.weapon = Weapons.IRON_SWORD.value
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = "PA"
+        
+    def get_total_attack_bonus(self) -> int:
+        return self.character_attack_bonus + self.weapon.attack_bonus
 
 
 class Ranger:
@@ -199,8 +244,14 @@ class Ranger:
         self.atk_bonus = pb + dex_mod
         self.damage_die = 8
         self.damage_bonus = dex_mod
+        self.weapon = Weapons.SHORTBOW.value
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = "RG"
+        
+    def get_total_attack_bonus(self) -> int:
+        return self.character_attack_bonus + self.weapon.attack_bonus
 
 
 class Rogue:
@@ -223,8 +274,13 @@ class Rogue:
         self.atk_bonus = pb + dex_mod
         self.damage_die = 8
         self.damage_bonus = dex_mod
+        self.weapon = Weapons.RAPIER.value
         self.alive = True
-        self.turn = True
+        self.turn = Trueself.defend = False
+        self.char = "RO"
+        
+    def get_total_attack_bonus(self) -> int:
+        return self.character_attack_bonus + self.weapon.attack_bonus
 
 
 class Sorcerer:
@@ -247,9 +303,14 @@ class Sorcerer:
         self.atk_bonus = pb + cha_mod
         self.damage_die = 6
         self.damage_bonus = cha_mod
+        self.weapon = Weapons.STAFF.value
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = "SO"
 
+    def get_total_attack_bonus(self) -> int:
+        return self.character_attack_bonus + self.weapon.attack_bonus
 
 class Warlock:
     def __init__(self, name: str = "Warlock", level: int = 1, scores: dict = None):
@@ -271,8 +332,14 @@ class Warlock:
         self.atk_bonus = pb + cha_mod
         self.damage_die = 6
         self.damage_bonus = cha_mod
+        self.weapon = Weapons.STAFF.value
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = "WK"
+        
+    def get_total_attack_bonus(self) -> int:
+        return self.character_attack_bonus + self.weapon.attack_bonus
 
 
 class Wizard:
@@ -295,5 +362,11 @@ class Wizard:
         self.atk_bonus = pb + int_mod
         self.damage_die = 6
         self.damage_bonus = int_mod
+        self.weapon = Weapons.STAFF.value
         self.alive = True
         self.turn = True
+        self.defend = False
+        self.char = "WZ"
+        
+    def get_total_attack_bonus(self) -> int:
+        return self.character_attack_bonus + self.weapon.attack_bonus
